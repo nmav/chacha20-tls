@@ -1,0 +1,633 @@
+<?xml version="1.0"?>
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
+<!ENTITY RFC2246 SYSTEM 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2246.xml'>
+<!ENTITY RFC4346 SYSTEM 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.4346.xml'>
+<!ENTITY RFC5246 SYSTEM 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.5246.xml'>
+<!ENTITY RFC4347 SYSTEM 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.4347.xml'>
+<!ENTITY RFC6347 SYSTEM 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.6347.xml'>
+<!ENTITY RFC4492 SYSTEM 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.4492.xml'>
+<!ENTITY RFC5489 SYSTEM 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.5489.xml'>
+<!ENTITY RFC5116 SYSTEM 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.5116.xml'>
+<!ENTITY RFC6101 SYSTEM 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.6101.xml'>
+<!ENTITY RFC6234 SYSTEM 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.6234.xml'>
+<!ENTITY CHACHAVECTORS SYSTEM 'http://xml.resource.org/public/rfc/bibxml-ids/reference.I-D.draft-strombergson-chacha-test-vectors-00.xml'>
+]>
+
+<?rfc compact="no"?>
+<?rfc toc="yes"?>
+<?rfc symrefs="yes"?>
+
+<rfc category="info" ipr="trust200902"
+     docName="draft-mavrogiannopoulos-chacha-tls-00">
+
+  <front>
+
+    <title abbrev="chacha20tls">
+      The ChaCha Stream Cipher for Transport Layer Security
+    </title>
+
+    <author initials="A." surname="Langley" fullname="Adam Langley">
+      <organization>Google Inc</organization>
+      <address>
+        <email>agl@google.com</email>
+      </address>
+    </author>
+
+    <author initials="W." surname="Chang" fullname="Wan-Teh Chang">
+      <organization>Google Inc</organization>
+      <address>
+        <email>wtc@google.com</email>
+      </address>
+    </author>
+
+    <author initials="N." surname="Mavrogiannopoulos"
+            fullname="Nikos Mavrogiannopoulos">
+      <organization>Red Hat</organization>
+      <address>
+        <email>nmav@redhat.com</email>
+      </address>
+    </author>
+
+    <author initials="J." surname="Strombergson"
+            fullname="Joachim Strombergson">
+      <organization>Secworks Sweden AB</organization>
+      <address>
+        <email>joachim@secworks.se</email>
+        <uri>http://secworks.se/</uri>
+      </address>
+    </author>
+
+    <author initials="S." surname="Josefsson"
+           fullname="Simon Josefsson">
+      <organization>SJD AB</organization>
+      <address>
+        <email>simon@josefsson.org</email>
+        <uri>http://josefsson.org/</uri>
+      </address>
+    </author>
+
+
+    <date month="January" year="2014"/>
+
+    <abstract>
+
+      <t>This document describes the use of the Chacha stream cipher with
+      HMAC-SHA1 and Poly1305 in Transport Layer Security (TLS) and Datagram
+      Transport Layer Security (DTLS) protocols.</t>
+
+    </abstract>
+    
+  </front>
+
+  <middle>
+
+    <section anchor="intro"
+             title="Introduction">
+
+      <t>This document describe how the Chacha stream cipher can be
+      used in the Transport Layer Security (TLS) version 1.0 <xref
+      target="RFC2246"/>, TLS version 1.1 <xref target="RFC4346"/>,
+      and TLS version 1.2 <xref target="RFC5246"/> protocols, as well
+      as in the Datagram Transport Layer Security (DTLS) versions 1.0
+      <xref target="RFC4347"/> and 1.2 <xref target="RFC6347"/>.  It
+      can also be used with Secure Sockets Layer (SSL) version 3.0
+      <xref target="RFC6101"/>.</t>
+
+      <t><xref target="chacha">Chacha</xref> is a stream cipher
+      that has been designed for high performance in software
+      implementations. The cipher has compact implementation and uses
+      few resources and inexpensive operations that makes it suitable
+      for implementation on a wide range of architectures. It 
+      has been designed to prevent leakage of information through side 
+      channel analysis, has a simple and fast key setup and provides
+      good overall performance.
+      It is a variant of Salsa20 <xref target="SALSA20SPEC"/> which is
+      one of the selected ciphers in the eSTREAM
+      portfolio <xref target="ESTREAM"/>.</t>
+
+      <t>Recent attacks <xref target="CBC-ATTACK"/> have indicated
+      problems with CBC-mode cipher suites in TLS and DTLS as well as
+      issues with the only supported stream cipher (RC4) <xref
+      target="RC4-ATTACK"/>.  While the existing AEAD (AES-GCM) ciphersuites 
+      address these issues, concerns about the performance and ease of software
+      implementation are sometimes raised.
+      Moreover, the DTLS protocol cannot take advantage of the only
+      available stream cipher (RC4) because it does not provide random access 
+      in the key stream.
+      </t>
+      
+      <t>Therefore, a new stream cipher to replace RC4 and address all the
+      previous issues is needed. It is the purpose of this document to describe
+      a secure stream cipher for both TLS and DTLS that is comparable to RC4 in
+      speed on a wide range of platforms and can be implemented fast and
+      securely (constant-time) in software.</t>
+
+    </section>
+
+    <section anchor="chacha20cipher"
+	     title="The Chacha Cipher">
+
+      <t>
+      <xref target="chacha">ChaCha</xref> is a stream cipher developed by D. J. Bernstein. 
+      It is a refinement of Salsa20 and was used as the core of the SHA-3 finalist, BLAKE.
+      </t>
+
+      <t>The variant of Chacha used in this draft is
+      Chacha with 20 rounds and a 256 bit key.  This
+      is the conservative with respect to security variant of 
+      the Chacha family. Test vectors for this cipher can
+      be found at <xref target="I-D.strombergson-chacha-test-vectors"/>.</t>
+
+      <t>
+        ChaCha maps 16, 32-bit input words to 16, 32-bit output words. By convention, 8 of 
+        the input words consist of a 256-bit key, 4 are constants and the remaining four are 
+        a nonce and block counter. The output words are converted to bytes and XORed with the
+        plaintext to produce ciphertext. In order to generate sufficient output bytes to XOR 
+        with the whole plaintext, the block counter is incremented and ChaCha is run again, 
+        as many times as needed, for up to 2^70 bytes of output.
+      </t>
+
+      <t>
+        ChaCha operates on a state of 16, 32-bit words which are initialised from the input 
+        words. The first four input words are constants: 
+      <figure>
+	<artwork><![CDATA[
+          (0x61707865, 0x3320646e, 0x79622d32, 0x6b206574)
+]]></artwork>
+      </figure>
+        Input words 4 through 11 are taken from the 256-bit key by reading the bytes in 
+        little-endian order, in 4-byte chunks. Input words 12 and 13 are a block counter, 
+        with word 12 overflowing into word 13. Lastly, words 14 and 15 are taken from 
+        an 8-byte nonce, again by reading the bytes in little-endian order, in 4-byte 
+        chunks. The block counter words are initially zero.
+      </t>
+
+      <t>
+        ChaCha consists of 20 rounds, alternating between "column" rounds and "diagonal" rounds. 
+        Each round applies the following "quarter-round" function four times, to a different 
+        set of words each time. The quarter-round function updates 4, 32-bit words (a, b, c, d) 
+        as follows, where &lt;&lt;&lt; is a bitwise, left rotation:
+      </t>
+
+      <figure>
+        <artwork>
+a += b; d ^= a; d &lt;&lt;&lt;= 16;
+c += d; b ^= c; b &lt;&lt;&lt;= 12;
+a += b; d ^= a; d &lt;&lt;&lt;= 8;
+c += d; b ^= c; b &lt;&lt;&lt;= 7;
+        </artwork>
+      </figure>
+
+      <t>
+        The 16 words are conceptually arranged in a four by four grid with the first word in 
+        the top-left position and the fourth word in the top-right position. The "column" rounds 
+        then apply the quarter-round function to the four columns, from left to right. The 
+        "diagonal" rounds apply the quarter-round to the top-left, bottom-right diagonal, 
+        followed by the pattern shifted one place to the right, for three more quarter-rounds.
+      </t>
+
+      <t>
+        Specifically, a column round applies the quarter-round function to the following 
+        indexes: (0, 4, 8, 12), (1, 5, 9, 13), (2, 6, 10, 14), (3, 7, 11, 15). A diagonal 
+        round applies it to these indexes: (0, 5, 10, 15), (1, 6, 11, 12), (2, 7, 8, 13), 
+        (3, 4, 9, 14).
+      </t>
+
+      <t>
+        After 20 rounds of the above processing, the original 16 input words are added to 
+        the 16 words to form the 16 output words.
+      </t>
+
+      <t>
+        The 64 output bytes are generated from the 16 output words by
+        serializing them in little-endian order and concatenating the results.
+      </t>
+    </section>
+
+    <section title="The Poly1305 Authenticator">
+      <t>
+        <xref target="poly1305">Poly1305</xref> is a Wegman-Carter, one-time authenticator
+        designed by D. J. Bernstein. Poly1305 takes a 32-byte, one-time key and a message 
+        and produces a 16-byte tag that authenticates the message such that an attacker has 
+        a negligible chance of producing a valid tag for an inauthentic message.
+      </t>
+
+      <t>
+        The first 16 bytes of the one-time key form an integer, <spanx style="emph">r</spanx>, 
+        as follows: the top four bits of the bytes at indexes 3, 7, 11 and 15 are cleared, 
+        the bottom 2 bits of the bytes at indexes 4, 8 and 12 are cleared and the 16 bytes 
+        are taken as a little-endian value.
+      </t>
+
+      <t>
+        An accumulator is set to zero. For each chunk of 16 bytes from the input message, 
+        a byte with value 1 is appended and the 17 bytes are treated as a little-endian 
+        number. If the last chunk has less than 16 bytes then zero bytes are appended after 
+        the 1 byte is appended until there are 17 bytes. The value is added to the 
+        accumulator and then the accumulator is multiplied by <spanx style="emph">r</spanx>, 
+        all mod 2^130 - 5.
+      </t>
+
+      <t>
+        Finally the last 16 bytes of the one-time key are treated as a little-endian number 
+        and added to the accumulator, mod 2^128. The result is serialised as a little-endian 
+        number, producing the 16 byte tag. Note that the original specification of Poly1305 
+        used AES to generate the constant term of the polynomial from a counter nonce. For 
+        a more recent treatment that avoids the use of a block cipher in this fashion, as 
+        is done here, see section 9 of <xref target="naclcrypto">the NaCl specification</xref>.
+      </t>
+    </section>
+
+    <section anchor="chacha20suites"
+	     title="Chacha Cipher Suites">
+      <t>In the next sections different ciphersuites are defined that utilize the
+      Chacha cipher combined with various message authentication methods.</t>
+
+      <t>In all cases, the pseudorandom function (PRF) for TLS 1.2 is the TLS PRF
+      with SHA-256 as the hash function.  When used with TLS versions
+      prior to 1.2, the PRF is calculated as specified in the
+      appropriate version of the TLS specification.</t>
+
+      <t>The RSA, DHE_RSA, ECDHE_RSA, ECDHE_ECDSA, PSK, DHE_PSK,
+      RSA_PSK, ECDHE_PSK key exchanges are performed as defined in
+      <xref target="RFC5246"/>, <xref target="RFC4492"/>, and <xref
+      target="RFC5489"/>.</t>
+
+    <section anchor="chacha20suites-sha1"
+	     title="Chacha Cipher Suites with HMAC-SHA1">
+
+      <t>The following CipherSuites are defined: (note that the third column
+      contains the suggested to IANA ciphersuite numbers)</t>
+
+      <figure>
+	<artwork><![CDATA[
+  TLS_RSA_WITH_CHACHA_SHA1
+  TLS_ECDHE_RSA_WITH_CHACHA_SHA1
+  TLS_ECDHE_ECDSA_WITH_CHACHA_SHA1
+
+  TLS_PSK_WITH_CHACHA_SHA1
+  TLS_ECDHE_PSK_WITH_CHACHA_SHA1
+  TLS_RSA_PSK_WITH_CHACHA_SHA1
+
+  TLS_DHE_PSK_WITH_CHACHA_SHA1
+  TLS_DHE_RSA_WITH_CHACHA_SHA1
+]]></artwork>
+      </figure>
+
+      <t>Note that Chacha requires a 64-bit nonce. That nonce is
+      updated on the encryption of every TLS record, and is set to be
+      the 64-bit TLS record sequence number. In case of DTLS the
+      64-bit nonce is formed as the concatenation of the 16-bit epoch 
+      with the 48-bit sequence number.</t>
+
+      <t>The MAC algorithm used in the ciphersuites above is HMAC-SHA1 <xref
+      target="RFC6234"/>.</t>
+
+    </section>
+
+    <section anchor="chacha20suites-poly1305"
+	     title="Chacha Cipher Suites with Poly1305">
+      <t>
+        The ChaCha20 and Poly1305 primitives are built into an 
+        <xref target="RFC5116">AEAD algorithm</xref>, AEAD_CHACHA_POLY1305, that takes 
+        a 32 byte key and 8 byte nonce as follows.
+      </t>
+
+      <t>
+        ChaCha20 is run with the given key and nonce and with the two counter words set to zero. 
+        The first 32 bytes of the 64 byte output are saved to become the one-time key for Poly1305. 
+        The remainder of the output is discarded. The first counter input word is set to one 
+        and the plaintext is encrypted by XORing it with the output of invocations of the 
+        ChaCha function as needed, incrementing the first counter word after each block and 
+        overflowing into the second. The limits on the TLS plaintext size mean 
+        that the first counter word will never overflow in practice.
+      </t>
+
+      <t>
+        The reason for generating the Poly1305 key like this rather than using key material 
+        from the handshake is that handshake key material is per-session, but for a polynomial 
+        MAC, a unique, secret key is needed per-record.
+      </t>
+
+      <t>
+        The Poly1305 key is used to calculate a tag for the following input: the concatenation 
+        of the additional data, the number of bytes of additional data, the ciphertext and the 
+        number of bytes of ciphertext. Numbers are represented as 8-byte, little-endian values. 
+        The resulting tag is appended to the ciphertext, resulting in the output of the AEAD 
+        operation.
+      </t>
+
+      <t>
+        Authenticated decryption is largely the reverse of the encryption process: generate one 
+        block of ChaCha keystream and use the first 32 bytes as a Poly1305 key. Feed Poly1305 the 
+        additional data and ciphertext, with the length suffixing as described above. Verify, in 
+        constant time, that the calculated Poly1305 authenticator matches the final 16 bytes of 
+        the input. If not, the input can be rejected immediately. Otherwise, run ChaCha, 
+        starting with a counter value of one, to decrypt the ciphertext.
+      </t>
+
+      <t>
+        When used in TLS, the <spanx style="verb">record_iv_length</spanx> is zero and the nonce is 
+        the sequence number for the record, as an 8-byte, big-endian number. The additional data is 
+        seq_num + TLSCompressed.type + TLSCompressed.version + TLSCompressed.length, where "+" denotes
+        concatenation.
+      </t>
+
+      <t>
+        In DTLS, the sequence number is only 48 bits. Thus, when used in DTLS, AEAD_CHACHA_POLY1305 
+        based cipher suites use the concatenation of the 16-bit epoch with the 48-bit sequence number 
+        as a replacement for TLS's 64-bit sequence number.
+      </t>
+
+      <t>
+        In accordance with section 4 of <xref target="RFC5116">RFC 5116</xref>, the constants for 
+        this AEAD algorithm are as follows: K_LEN is 32 bytes, N_MIN and N_MAX are 8 bytes, P_MAX 
+        and A_MAX are 2^64, C_MAX is 2^64+16. An AEAD_CHACHA_POLY1305 ciphertext is exactly 16 octets 
+        longer than its corresponding plaintext.
+      </t>
+
+      <figure>
+      <figure>
+	<artwork><![CDATA[
+  TLS_ECDHE_RSA_WITH_CHACHA_POLY1305_SHA256
+  TLS_ECDHE_ECDSA_WITH_CHACHA_POLY1305_SHA256
+  TLS_DHE_RSA_WITH_CHACHA_POLY1305_SHA256
+]]></artwork>
+      </figure>
+
+
+    </section>
+    </section>
+
+    <section anchor="streamcipher"
+	     title="The TLS GenericStreamCipher">
+<t>The ciphersuites defined in this document differ from the TLS RC4 ciphersuites
+that have been the basis for the definition of GenericStreamCipher.
+Unlike RC4, Chacha requires a nonce per record. This however, does not affect 
+the description of the GenericStreamCipher if one assumes that a nonce is 
+optional and depends on the cipher's characteristics (in that case RC4 uses a 
+0 byte nonce, and Chacha an 8-byte nonce).
+</t>
+  <t>As specified in TLS <xref target="RFC5246"/> the MAC is computed before encryption and the stream
+cipher encrypts the entire block, including the MAC.</t>
+
+    </section>
+    
+    <section anchor="ack"
+             title="Acknowledgements">
+
+      <t>The authors would like to thank Zooko Wilcox-OHearn and
+      Samuel Neves for suggestions that led to this draft.</t>
+
+    </section>
+
+    <section anchor="iana"
+             title="IANA Considerations">
+
+      <t>IANA is requested to allocate the following numbers in the
+      TLS Cipher Suite Registry (note that the third column
+      contains the suggested ciphersuite numbers):</t>
+
+      <figure>
+	<artwork><![CDATA[
+  TLS_RSA_WITH_CHACHA_SHA1                 = {0xTBD, 0xTBD}  {0xE5, 0x00}
+  TLS_ECDHE_RSA_WITH_CHACHA_SHA1           = {0xTBD, 0xTBD}  {0xE5, 0x01}
+  TLS_ECDHE_ECDSA_WITH_CHACHA_SHA1         = {0xTBD, 0xTBD}  {0xE5, 0x02}
+
+  TLS_PSK_WITH_CHACHA_SHA1                 = {0xTBD, 0xTBD}  {0xE5, 0x03}
+  TLS_ECDHE_PSK_WITH_CHACHA_SHA1           = {0xTBD, 0xTBD}  {0xE5, 0x04}
+  TLS_RSA_PSK_WITH_CHACHA_SHA1             = {0xTBD, 0xTBD}  {0xE5, 0x05}
+
+  TLS_DHE_PSK_WITH_CHACHA_SHA1             = {0xTBD, 0xTBD}  {0xE5, 0x06}
+  TLS_DHE_RSA_WITH_CHACHA_SHA1             = {0xTBD, 0xTBD}  {0xE5, 0x07}
+
+  TLS_ECDHE_RSA_WITH_CHACHA_POLY1305_SHA256   = {0xTBD, 0xTBD} {0xcc, 0x13}
+  TLS_ECDHE_ECDSA_WITH_CHACHA_POLY1305_SHA256 = {0xTBD, 0xTBD} {0xcc, 0x14}
+  TLS_DHE_RSA_WITH_CHACHA_POLY1305_SHA256 =     {0xTBD, 0xTBD} {0xcc, 0x15}
+]]></artwork>
+      </figure>
+
+    </section>
+
+    <section anchor="security"
+             title="Security Considerations">
+
+      <t>Chacha follows the same basic principle as Salsa20, a cipher
+      with significant security review <xref target="SALSA20-SECURITY"/><xref target="ESTREAM"/>.
+      At the time of writing this document, there are no known significant 
+      security problems with either cipher, and Chacha is shown to be more
+      resistant in certain attacks than Salsa20 <xref target="SALSA20-ATTACK"/>.
+      Furthermore Chacha was used as the core of the BLAKE hash function,
+      a SHA3 finalist, that had received considerable cryptanalytic
+      attention <xref target="NIST-SHA3"/>.
+      </t>
+
+      <t>
+        Poly1305 is designed to 
+        ensure that forged messages are rejected with a probability of 1-(n/2^102) for 
+        a 16*n byte message, even after sending 2^64 legitimate messages.
+      </t>
+<!--
+      <t>
+        The AEAD_CHACHA_POLY1305 algorithm is designed to meet the standard notions of privacy 
+        and authenticity. For formal definitions see <xref target="AE">Authenticated Encryption</xref>.
+      </t>
+-->
+      <t>
+        These cipher suites require that an nonce never be repeated for the same key. 
+        This is achieved by simply using the TLS sequence number.
+      </t>
+
+      <t>
+        Only forward secure cipher suites are defined as it's incongruous to define a 
+        high-security cipher suite without forward security.
+      </t>
+
+      <t>This document should not introduce any other security
+      considerations than those that directly follow from any use of
+      the stream cipher Chacha and those that directly follow from
+      introducing any set of stream cipher suites into TLS and
+      DTLS.</t>
+
+    </section>
+    
+  </middle>
+
+  <back>
+
+    <references title="Normative References">
+
+      &RFC2246;
+      &RFC4346;
+      &RFC5246;
+      &RFC4347;
+      &RFC4492;
+      &RFC5116;
+      &RFC5489;
+      &RFC6347;
+      &RFC6234;
+      
+      <reference anchor="chacha">
+	<front>
+	  <title>Chacha, a variant of Salsa20</title>
+	  <author initials="D.J." surname="Bernstein"
+		  fullname="D.J. Bernstein"/>
+	  <date month="January" year="2008" />
+	</front>
+	<seriesInfo name="WWW" value="http://cr.yp.to/chacha/chacha-20080128.pdf" />
+      </reference>
+
+      <reference anchor="poly1305" target="http://cr.yp.to/mac/poly1305-20050329.pdf">
+        <front>
+          <title>The Poly1305-AES message-authentication code.</title>
+          <author initials="D. J." surname="Bernstein"></author>
+          <date month="March" year="2005"/>
+        </front>
+      </reference>
+
+    </references>
+
+    <references title="Informative References">
+    
+      &CHACHAVECTORS;
+
+      <reference anchor="SALSA20SPEC">
+	<front>
+	  <title>Salsa20 specification</title>
+	  <author initials="D.J." surname="Bernstein"
+		  fullname="D.J. Bernstein"/>
+	  <date month="April" year="2005" />
+	</front>
+	<seriesInfo name="WWW" value="http://cr.yp.to/snuffle/spec.pdf" />
+      </reference>
+
+      &RFC6101;
+
+      <reference anchor="SALSA20-SECURITY">
+	<front>
+	  <title>Salsa20 security</title>
+	  <author initials="D.J." surname="Bernstein"
+		  fullname="D.J. Bernstein"/>
+	  <date month="April" year="2005" />
+	</front>
+	<seriesInfo name="WWW" value="http://cr.yp.to/snuffle/security.pdf" />
+      </reference>
+
+      <reference anchor="ESTREAM">
+	<front>
+	  <title>The eSTREAM Portfolio (rev. 1)</title>
+	  <author initials="S." surname="Babbage"
+		  fullname="Steve Babbage"/>
+	  <author initials="C." surname="DeCanniere"
+		  fullname="Christophe De Canniere"/>
+	  <author initials="A." surname="Cantenaut"
+		  fullname="Anne Cantenaut"/>
+	  <author initials="C." surname="Cid"
+		  fullname="Carlos Cid"/>
+	  <author initials="H." surname="Gilbert"
+		  fullname="Henri Gilbert"/>
+	  <author initials="T." surname="Johansson"
+		  fullname="Thomas Johansson"/>
+	  <author initials="M." surname="Parker"
+		  fullname="Matthew Parker"/>
+	  <author initials="B." surname="Preneel"
+		  fullname="Bart Preneel"/>
+	  <author initials="V." surname="Rijmen"
+		  fullname="Vincent Rijmen"/>
+	  <author initials="M." surname="Robshaw"
+		  fullname="Matthew Robshaw"/>
+	  <date month="September" year="2008" />
+	</front>
+	<seriesInfo name="WWW" value="http://www.ecrypt.eu.org/stream/finallist.html" />
+      </reference>
+
+      <reference anchor="CBC-ATTACK">
+	<front>
+	  <title>Lucky Thirteen: Breaking the 
+	  TLS and DTLS Record Protocols</title>
+	  <author initials="N.J." surname="AlFardan"
+		  fullname="Nadhem J. AlFardan"/>
+	  <author initials="K." surname="Paterson"
+		  fullname="K. Paterson"/>
+	  <date year="2013" />
+	</front>
+        <seriesInfo name="IEEE Symposium on Security and Privacy" value=""/>
+      </reference>
+
+      <reference anchor="RC4-ATTACK">
+	<front>
+	  <title>Full Plaintext Recovery Attack on Broadcast RC4</title>
+	  <author initials="T." surname="Isobe"
+		  fullname="Takanori Isobe"/>
+	  <author initials="T." surname="Ohigashi"
+		  fullname="Toshihiro Ohigashi"/>
+	  <author initials="Y." surname="Watanabe"
+		  fullname="Yuhei Watanabe"/>
+	  <author initials="M." surname="Morii"
+		  fullname="Masakatu Morii"/>
+	  <date year="2013" />
+	</front>
+	<seriesInfo name="International Workshop on Fast Software Encryption" value=""/>
+      </reference>
+
+      <reference anchor="SALSA20-ATTACK">
+	<front>
+	  <title>New Features of Latin Dances: Analysis of Salsa, ChaCha, and Rumba</title>
+	  <author initials="J-P." surname="Aumasson"
+		  fullname="Jean-Philippe Aumasson"/>
+	  <author initials="S." surname="Fischer"
+		  fullname="Simon Fischer"/>
+	  <author initials="S." surname="Khazaei"
+		  fullname="Shahram Khazaei"/>
+	  <author initials="W." surname="Meier"
+		  fullname="Willi Meier"/>
+	  <author initials="C." surname="Rechberger"
+		  fullname="Christian Rechberger"/>
+	  <date year="2007" />
+	</front>
+	<seriesInfo name="WWW" value="http://eprint.iacr.org/2007/472.pdf"/>
+      </reference>
+
+      <reference anchor="naclcrypto" target="http://cr.yp.to/highspeed/naclcrypto-20090310.pdf">
+        <front>
+          <title>http://cr.yp.to/highspeed/naclcrypto-20090310.pdf</title>
+          <author initials="D. J." surname="Bernstein"></author>
+          <date month="March" year="2009"/>
+        </front>
+      </reference>
+
+      <reference anchor="NIST-SHA3">
+	<front>
+	  <title>Third-Round Report of the SHA-3
+	  Cryptographic Hash Algorithm Competition</title>
+	  <author initials="S." surname="Chang"
+		  fullname="Shu-jen Chang"/>
+	  <author initials="W." surname="Burr"
+		  fullname="William E. Burr"/>
+	  <author initials="J." surname="Kelsey"
+		  fullname="John M. Kelsey"/>
+	  <author initials="S." surname="Paul"
+		  fullname="Souradyuti Paul"/>
+	  <author initials="L." surname="Bassham"
+		  fullname="Lawrence E. Bassham"/>
+	  <date year="2012" />
+	</front>
+	<seriesInfo name="WWW" value="http://dx.doi.org/10.6028/NIST.IR.7896"/>
+      </reference>
+
+<!--      <reference anchor="KEY-RECOVERY-MAC">
+	<front>
+	  <title>Key-recovery attacks on universal hash function based
+          MAC algorithms.</title>
+	  <author initials="H." surname="Handschuh"
+		  fullname="Helena Handschuh"/>
+	  <author initials="B." surname="Preneel"
+		  fullname="Bart Preneel"/>
+	  <date year="2008" />
+	</front>
+      </reference>-->
+
+    </references>
+  </back>
+
+</rfc>
