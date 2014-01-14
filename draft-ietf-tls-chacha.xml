@@ -349,9 +349,16 @@ c += d; b ^= c; b &lt;&lt;&lt;= 7;
       <figure>
       <figure>
 	<artwork><![CDATA[
+  TLS_RSA_WITH_CHACHA_POLY1305_SHA256
   TLS_ECDHE_RSA_WITH_CHACHA_POLY1305_SHA256
   TLS_ECDHE_ECDSA_WITH_CHACHA_POLY1305_SHA256
+
   TLS_DHE_RSA_WITH_CHACHA_POLY1305_SHA256
+  TLS_DHE_PSK_WITH_CHACHA_POLY1305_SHA256
+
+  TLS_PSK_WITH_CHACHA_POLY1305_SHA256
+  TLS_ECDHE_PSK_WITH_CHACHA_POLY1305_SHA256
+  TLS_RSA_PSK_WITH_CHACHA_POLY1305_SHA256
 ]]></artwork>
       </figure>
 
@@ -390,20 +397,29 @@ cipher encrypts the entire block, including the MAC.</t>
 
       <figure>
 	<artwork><![CDATA[
-  TLS_RSA_WITH_CHACHA_SHA1                 = {0xTBD, 0xTBD}  {0xE5, 0x00}
-  TLS_ECDHE_RSA_WITH_CHACHA_SHA1           = {0xTBD, 0xTBD}  {0xE5, 0x01}
-  TLS_ECDHE_ECDSA_WITH_CHACHA_SHA1         = {0xTBD, 0xTBD}  {0xE5, 0x02}
+  TLS_RSA_WITH_CHACHA_POLY1305_SHA256     = {0xTBD, 0xTBD} {0xCC, 0x12}
+  TLS_ECDHE_RSA_WITH_CHACHA_POLY1305_SHA256   = {0xTBD, 0xTBD} {0xCC, 0x13}
+  TLS_ECDHE_ECDSA_WITH_CHACHA_POLY1305_SHA256 = {0xTBD, 0xTBD} {0xCC, 0x14}
 
-  TLS_PSK_WITH_CHACHA_SHA1                 = {0xTBD, 0xTBD}  {0xE5, 0x03}
-  TLS_ECDHE_PSK_WITH_CHACHA_SHA1           = {0xTBD, 0xTBD}  {0xE5, 0x04}
-  TLS_RSA_PSK_WITH_CHACHA_SHA1             = {0xTBD, 0xTBD}  {0xE5, 0x05}
+  TLS_DHE_RSA_WITH_CHACHA_POLY1305_SHA256 =     {0xTBD, 0xTBD} {0xCC, 0x15}
+  TLS_DHE_PSK_WITH_CHACHA_POLY1305_SHA256 =     {0xTBD, 0xTBD} {0xCC, 0x16}
 
-  TLS_DHE_PSK_WITH_CHACHA_SHA1             = {0xTBD, 0xTBD}  {0xE5, 0x06}
-  TLS_DHE_RSA_WITH_CHACHA_SHA1             = {0xTBD, 0xTBD}  {0xE5, 0x07}
+  TLS_PSK_WITH_CHACHA_POLY1305_SHA256     =     {0xTBD, 0xTBD} {0xCC, 0x17}
+  TLS_ECDHE_PSK_WITH_CHACHA_POLY1305_SHA256   = {0xTBD, 0xTBD} {0xCC, 0x18}
+  TLS_RSA_PSK_WITH_CHACHA_POLY1305_SHA256     = {0xTBD, 0xTBD} {0xCC, 0x19}
 
-  TLS_ECDHE_RSA_WITH_CHACHA_POLY1305_SHA256   = {0xTBD, 0xTBD} {0xcc, 0x13}
-  TLS_ECDHE_ECDSA_WITH_CHACHA_POLY1305_SHA256 = {0xTBD, 0xTBD} {0xcc, 0x14}
-  TLS_DHE_RSA_WITH_CHACHA_POLY1305_SHA256 =     {0xTBD, 0xTBD} {0xcc, 0x15}
+  TLS_RSA_WITH_CHACHA_SHA1                 = {0xTBD, 0xTBD}  {0xCC, 0x20}
+  TLS_ECDHE_RSA_WITH_CHACHA_SHA1           = {0xTBD, 0xTBD}  {0xCC, 0x21}
+  TLS_ECDHE_ECDSA_WITH_CHACHA_SHA1         = {0xTBD, 0xTBD}  {0xCC, 0x22}
+
+  TLS_DHE_RSA_WITH_CHACHA_SHA1             = {0xTBD, 0xTBD}  {0xCC, 0x23}
+  TLS_DHE_PSK_WITH_CHACHA_SHA1             = {0xTBD, 0xTBD}  {0xCC, 0x24}
+
+  TLS_PSK_WITH_CHACHA_SHA1                 = {0xTBD, 0xTBD}  {0xCC, 0x25}
+  TLS_ECDHE_PSK_WITH_CHACHA_SHA1           = {0xTBD, 0xTBD}  {0xCC, 0x26}
+  TLS_RSA_PSK_WITH_CHACHA_SHA1             = {0xTBD, 0xTBD}  {0xCC, 0x27}
+
+
 ]]></artwork>
       </figure>
 
@@ -436,11 +452,6 @@ cipher encrypts the entire block, including the MAC.</t>
       <t>
         These cipher suites require that an nonce never be repeated for the same key. 
         This is achieved by simply using the TLS sequence number.
-      </t>
-
-      <t>
-        Only forward secure cipher suites are defined as it's incongruous to define a 
-        high-security cipher suite without forward security.
       </t>
 
       <t>This document should not introduce any other security
