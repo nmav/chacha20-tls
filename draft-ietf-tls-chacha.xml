@@ -84,8 +84,8 @@
     <section anchor="intro"
              title="Introduction">
 
-      <t>This document describe how the ChaCha stream cipher can be
-      used in the Transport Layer Security (TLS) version 1.0 <xref
+      <t>This document describes the use of the ChaCha stream 
+      in the Transport Layer Security (TLS) version 1.0 <xref
       target="RFC2246"/>, TLS version 1.1 <xref target="RFC4346"/>,
       and TLS version 1.2 <xref target="RFC5246"/> protocols, as well
       as in the Datagram Transport Layer Security (DTLS) versions 1.0
@@ -93,7 +93,7 @@
       can also be used with Secure Sockets Layer (SSL) version 3.0
       <xref target="RFC6101"/>.</t>
 
-      <t><xref target="chacha">ChaCha</xref> is a stream cipher
+      <t><xref target="CHACHA">ChaCha</xref> is a stream cipher
       that has been designed for high performance in software
       implementations. The cipher has compact implementation and uses
       few resources and inexpensive operations that makes it suitable
@@ -128,7 +128,7 @@
 	     title="The ChaCha Cipher">
 
       <t>
-      <xref target="chacha">ChaCha</xref> is a stream cipher developed by D. J. Bernstein. 
+      <xref target="CHACHA">ChaCha</xref> is a stream cipher developed by D. J. Bernstein. 
       It is a refinement of Salsa20 and was used as the core of the SHA-3 finalist, BLAKE.
       </t>
 
@@ -499,7 +499,7 @@ dependencies between records.
       &RFC6347;
       &RFC6234;
       
-      <reference anchor="chacha">
+      <reference anchor="CHACHA">
 	<front>
 	  <title>ChaCha, a variant of Salsa20</title>
 	  <author initials="D.J." surname="Bernstein"
