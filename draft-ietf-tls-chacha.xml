@@ -18,11 +18,11 @@
 <?rfc symrefs="yes"?>
 
 <rfc category="info" ipr="trust200902"
-     docName="draft-mavrogiannopoulos-chacha-tls-00">
+     docName="draft-ietf-tls-chacha-00">
 
   <front>
 
-    <title abbrev="chacha20tls">
+    <title abbrev="chacha-tls">
       The ChaCha Stream Cipher for Transport Layer Security
     </title>
 
