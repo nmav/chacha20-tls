@@ -406,7 +406,7 @@ dependencies between records.
              title="Acknowledgements">
 
       <t>The authors would like to thank Zooko Wilcox-OHearn and
-      Samuel Neves for suggestions that led to this draft.</t>
+      Samuel Neves.</t> <!-- for suggestions that led to this draft.</t>-->
 
     </section>
 
