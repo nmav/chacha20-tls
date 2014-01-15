@@ -347,7 +347,6 @@ c += d; b ^= c; b &lt;&lt;&lt;= 7;
       </t>
 
       <figure>
-      <figure>
 	<artwork><![CDATA[
   TLS_RSA_WITH_CHACHA_POLY1305_SHA256
   TLS_ECDHE_RSA_WITH_CHACHA_POLY1305_SHA256
