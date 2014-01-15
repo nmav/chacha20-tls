@@ -366,16 +366,24 @@ c += d; b ^= c; b &lt;&lt;&lt;= 7;
     </section>
 
     <section anchor="streamcipher"
-	     title="The TLS GenericStreamCipher">
-<t>The ciphersuites defined in this document differ from the TLS RC4 ciphersuites
-that have been the basis for the definition of GenericStreamCipher.
+	     title="Updates to the TLS GenericStreamCipher">
+<t>The Chacha ciphersuites with HMAC-SHA1 defined in this document differ 
+from the TLS RC4 ciphersuites that have been the basis for the definition of 
+GenericStreamCipher.
 Unlike RC4, Chacha requires a nonce per record. This however, does not affect 
 the description of the GenericStreamCipher if one assumes that a nonce is 
-optional and depends on the cipher's characteristics (in that case RC4 uses a 
-0 byte nonce, and Chacha an 8-byte nonce).
+optional and depends on the cipher's characteristics.
 </t>
-  <t>As specified in TLS <xref target="RFC5246"/> the MAC is computed before encryption and the stream
-cipher encrypts the entire block, including the MAC.</t>
+<t>
+Hence, this document appends the property of nonce to the GenericStreamCipher
+characteristics and RC4 is assigned to use a 0-byte nonce, while Chacha with HMAC-SHA1 
+an 8-byte nonce. In the case the nonce is 8-bytes the nonce is set to be
+the 64-bit TLS record sequence number. In case of DTLS the
+64-bit nonce is formed as the concatenation of the 16-bit epoch 
+with the 48-bit sequence number.
+</t>
+<!--  <t>As specified in TLS <xref target="RFC5246"/> the MAC is computed before encryption and the stream
+cipher encrypts the entire block, including the MAC.</t>-->
 
     </section>
     
