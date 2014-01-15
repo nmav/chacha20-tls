@@ -463,15 +463,11 @@ dependencies between records.
         ensure that forged messages are rejected with a probability of 1-(n/2^102) for 
         a 16*n byte message, even after sending 2^64 legitimate messages.
       </t>
-<!--
       <t>
-        The AEAD_CHACHA_POLY1305 algorithm is designed to meet the standard notions of privacy 
-        and authenticity. For formal definitions see <xref target="AE">Authenticated Encryption</xref>.
-      </t>
--->
-      <t>
-        These cipher suites require that an nonce never be repeated for the same key. 
-        This is achieved by simply using the TLS sequence number.
+        The cipher suites described in this document require that an nonce
+        is never repeated under the same key. The design presented ensures
+        that by using the TLS sequence number which is unique and does not
+        wrap <xref target="RFC5246"/>.
       </t>
 
       <t>This document should not introduce any other security
