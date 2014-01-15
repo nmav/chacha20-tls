@@ -109,19 +109,18 @@
       problems with CBC-mode cipher suites in TLS and DTLS as well as
       issues with the only supported stream cipher (RC4) <xref
       target="RC4-ATTACK"/>.  While the existing AEAD (AES-GCM) ciphersuites 
-      address these issues, concerns about the performance and ease of software
+      address some of these issues, concerns about the performance and ease of software
       implementation are sometimes raised.
-      Moreover, the DTLS protocol cannot take advantage of the only
+<!--      Moreover, the DTLS protocol cannot take advantage of the only
       available stream cipher (RC4) because it does not provide random access 
-      in the key stream.
+      in the key stream.-->
       </t>
       
       <t>Therefore, a new stream cipher to replace RC4 and address all the
       previous issues is needed. It is the purpose of this document to describe
       a secure stream cipher for both TLS and DTLS that is comparable to RC4 in
       speed on a wide range of platforms and can be implemented fast and
-      securely (constant-time) in software.</t>
-
+      without timing side-channels in software.</t>
     </section>
 
     <section anchor="chacha20cipher"
@@ -232,9 +231,9 @@ c += d; b ^= c; b &lt;&lt;&lt;= 7;
         Finally the last 16 bytes of the one-time key are treated as a little-endian number 
         and added to the accumulator, mod 2^128. The result is serialised as a little-endian 
         number, producing the 16 byte tag. Note that the original specification of Poly1305 
-        used AES to generate the constant term of the polynomial from a counter nonce. For 
-        a more recent treatment that avoids the use of a block cipher in this fashion, as 
-        is done here, see section 9 of <xref target="naclcrypto">the NaCl specification</xref>.
+        used a different construction with AES to generate the constant term of the polynomial 
+        from a counter nonce. For a more recent treatment that avoids the use of a block cipher 
+        in this fashion, as is done here, see section 9 of <xref target="NACLCRYPTO">the NaCl specification</xref>.
       </t>
     </section>
 
@@ -256,8 +255,7 @@ c += d; b ^= c; b &lt;&lt;&lt;= 7;
     <section anchor="chacha20suites-sha1"
 	     title="ChaCha Cipher Suites with HMAC-SHA1">
 
-      <t>The following CipherSuites are defined: (note that the third column
-      contains the suggested to IANA ciphersuite numbers)</t>
+      <t>The following CipherSuites are defined.</t>
 
       <figure>
 	<artwork><![CDATA[
@@ -346,6 +344,7 @@ c += d; b ^= c; b &lt;&lt;&lt;= 7;
         longer than its corresponding plaintext.
       </t>
 
+      <t>The following CipherSuites are defined.</t>
       <figure>
 	<artwork><![CDATA[
   TLS_RSA_WITH_CHACHA_POLY1305_SHA256
@@ -620,9 +619,9 @@ dependencies between records.
 	<seriesInfo name="WWW" value="http://eprint.iacr.org/2007/472.pdf"/>
       </reference>
 
-      <reference anchor="naclcrypto" target="http://cr.yp.to/highspeed/naclcrypto-20090310.pdf">
+      <reference anchor="NACLCRYPTO" target="http://cr.yp.to/highspeed/naclcrypto-20090310.pdf">
         <front>
-          <title>http://cr.yp.to/highspeed/naclcrypto-20090310.pdf</title>
+          <title>Cryptography in NaCl</title>
           <author initials="D. J." surname="Bernstein"></author>
           <date month="March" year="2009"/>
         </front>
