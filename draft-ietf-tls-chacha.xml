@@ -495,13 +495,13 @@ dependencies between records.
 
       &RFC2246;
       &RFC4346;
-      &RFC5246;
       &RFC4347;
       &RFC4492;
       &RFC5116;
+      &RFC5246;
       &RFC5489;
-      &RFC6347;
       &RFC6234;
+      &RFC6347;
       
       <reference anchor="CHACHA" target="http://cr.yp.to/chacha/chacha-20080128.pdf">
 	<front>
