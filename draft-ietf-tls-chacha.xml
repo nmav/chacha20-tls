@@ -119,8 +119,8 @@
       <t>Therefore, a new stream cipher to replace RC4 and address all the
       previous issues is needed. It is the purpose of this document to describe
       a secure stream cipher for both TLS and DTLS that is comparable to RC4 in
-      speed on a wide range of platforms and can be implemented fast and
-      without timing side-channels in software.</t>
+      speed on a wide range of platforms and can be implemented easily
+      without being vulnerable to software side-channel attacks.</t>
     </section>
 
     <section anchor="chacha20cipher"
