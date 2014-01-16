@@ -384,7 +384,7 @@ optional and depends on the cipher's characteristics.
 </t>
 <t>
 Hence, this document modifies the Standard Stream Cipher by adding an
-implicit nonce of 8-bytes, which is set to be
+nonce of 8-bytes, which is set to be
 the 64-bit TLS record sequence number. Stream ciphers that don't require
 a nonce such as RC4 shall ignore it. Other stream ciphers that require
 a nonce, such as ChaCha with HMAC-SHA1, will use the nonce and reset their 
@@ -392,7 +392,8 @@ state on each record.
 </t>
 <t>
 Note that in case of DTLS the 8-byte nonce is formed as the concatenation of the 
-16-bit epoch with the 48-bit sequence number.
+16-bit epoch with the 48-bit sequence number, which are sent as part of the
+record.
 </t>
    </section>
     <section anchor="updates-dtls"
