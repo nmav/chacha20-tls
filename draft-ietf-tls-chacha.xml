@@ -10,7 +10,7 @@
 <!ENTITY RFC5116 SYSTEM 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.5116.xml'>
 <!ENTITY RFC6101 SYSTEM 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.6101.xml'>
 <!ENTITY RFC6234 SYSTEM 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.6234.xml'>
-<!ENTITY CHACHAVECTORS SYSTEM 'http://xml.resource.org/public/rfc/bibxml-ids/reference.I-D.draft-strombergson-chacha-test-vectors-00.xml'>
+<!-- <!ENTITY CHACHAVECTORS SYSTEM 'http://xml.resource.org/public/rfc/bibxml-ids/reference.I-D.draft-strombergson-chacha-test-vectors-00.xml'>-->
 ]>
 
 <?rfc compact="no"?>
@@ -127,15 +127,14 @@
 	     title="The ChaCha Cipher">
 
       <t>
-      <xref target="CHACHA">ChaCha</xref> is a stream cipher developed by D. J. Bernstein. 
-      It is a refinement of Salsa20 and was used as the core of the SHA-3 finalist, BLAKE.
+      <xref target="CHACHA">ChaCha</xref> is a stream cipher developed by D. J. Bernstein
+      in 2008. It is a refinement of Salsa20 and was used as the core of the SHA-3 finalist, BLAKE.
       </t>
 
       <t>The variant of ChaCha used in this draft is
       ChaCha with 20 rounds and a 256 bit key.  This
       is the conservative with respect to security variant of 
-      the ChaCha family. Test vectors for this cipher can
-      be found at <xref target="I-D.strombergson-chacha-test-vectors"/>.</t>
+      the ChaCha family.</t>
 
       <t>
         ChaCha maps 16, 32-bit input words to 16, 32-bit output words. By convention, 8 of 
@@ -201,11 +200,14 @@ c += d; b ^= c; b &lt;&lt;&lt;= 7;
         The 64 output bytes are generated from the 16 output words by
         serializing them in little-endian order and concatenating the results.
       </t>
+      <t>
+       Test vectors for this cipher can be found in <xref target="chacha-test-vectors"/>.
+      </t>
     </section>
 
     <section title="The Poly1305 Authenticator">
       <t>
-        <xref target="poly1305">Poly1305</xref> is a Wegman-Carter, one-time authenticator
+        <xref target="POLY1305">Poly1305</xref> is a Wegman-Carter, one-time authenticator
         designed by D. J. Bernstein. Poly1305 takes a 32-byte, one-time key and a message 
         and produces a 16-byte tag that authenticates the message such that an attacker has 
         a negligible chance of producing a valid tag for an inauthentic message.
@@ -234,6 +236,9 @@ c += d; b ^= c; b &lt;&lt;&lt;= 7;
         used a different construction with AES to generate the constant term of the polynomial 
         from a counter nonce. For a more recent treatment that avoids the use of a block cipher 
         in this fashion, as is done here, see section 9 of <xref target="NACLCRYPTO">the NaCl specification</xref>.
+      </t>
+      <t>
+       Test vectors for this authenticator can be found in <xref target="poly1305-test-vectors"/>.
       </t>
     </section>
 
@@ -342,6 +347,10 @@ c += d; b ^= c; b &lt;&lt;&lt;= 7;
         this AEAD algorithm are as follows: K_LEN is 32 bytes, N_MIN and N_MAX are 8 bytes, P_MAX 
         and A_MAX are 2^64, C_MAX is 2^64+16. An AEAD_CHACHA_POLY1305 ciphertext is exactly 16 octets 
         longer than its corresponding plaintext.
+      </t>
+
+      <t>
+       Test vectors for this authenticator can be found in <xref target="aead-chacha-poly1305-test-vectors"/>.
       </t>
 
       <t>The following CipherSuites are defined.</t>
@@ -471,10 +480,10 @@ dependencies between records.
       </t>
 
       <t>This document should not introduce any other security
-      considerations than those that directly follow from any use of
-      the stream cipher ChaCha and those that directly follow from
-      introducing any set of stream cipher suites into TLS and
-      DTLS.</t>
+      considerations than those that directly follow from the use of
+      the stream cipher ChaCha, the AEAD_CHACHA_POLY1305 construction, and 
+      those that directly follow from introducing any set of stream cipher 
+      suites into TLS and DTLS.</t>
 
     </section>
     
@@ -494,17 +503,16 @@ dependencies between records.
       &RFC6347;
       &RFC6234;
       
-      <reference anchor="CHACHA">
+      <reference anchor="CHACHA" target="http://cr.yp.to/chacha/chacha-20080128.pdf">
 	<front>
 	  <title>ChaCha, a variant of Salsa20</title>
 	  <author initials="D.J." surname="Bernstein"
 		  fullname="D.J. Bernstein"/>
 	  <date month="January" year="2008" />
 	</front>
-	<seriesInfo name="WWW" value="http://cr.yp.to/chacha/chacha-20080128.pdf" />
       </reference>
 
-      <reference anchor="poly1305" target="http://cr.yp.to/mac/poly1305-20050329.pdf">
+      <reference anchor="POLY1305" target="http://cr.yp.to/mac/poly1305-20050329.pdf">
         <front>
           <title>The Poly1305-AES message-authentication code.</title>
           <author initials="D. J." surname="Bernstein"></author>
@@ -516,31 +524,29 @@ dependencies between records.
 
     <references title="Informative References">
     
-      &CHACHAVECTORS;
+<!--      &CHACHAVECTORS;-->
 
-      <reference anchor="SALSA20SPEC">
+      <reference anchor="SALSA20SPEC" target="http://cr.yp.to/snuffle/spec.pdf">
 	<front>
 	  <title>Salsa20 specification</title>
 	  <author initials="D.J." surname="Bernstein"
 		  fullname="D.J. Bernstein"/>
 	  <date month="April" year="2005" />
 	</front>
-	<seriesInfo name="WWW" value="http://cr.yp.to/snuffle/spec.pdf" />
       </reference>
 
       &RFC6101;
 
-      <reference anchor="SALSA20-SECURITY">
+      <reference anchor="SALSA20-SECURITY" target="http://cr.yp.to/snuffle/security.pdf">
 	<front>
 	  <title>Salsa20 security</title>
 	  <author initials="D.J." surname="Bernstein"
 		  fullname="D.J. Bernstein"/>
 	  <date month="April" year="2005" />
 	</front>
-	<seriesInfo name="WWW" value="http://cr.yp.to/snuffle/security.pdf" />
       </reference>
 
-      <reference anchor="ESTREAM">
+      <reference anchor="ESTREAM" target="http://www.ecrypt.eu.org/stream/finallist.html">
 	<front>
 	  <title>The eSTREAM Portfolio (rev. 1)</title>
 	  <author initials="S." surname="Babbage"
@@ -565,7 +571,6 @@ dependencies between records.
 		  fullname="Matthew Robshaw"/>
 	  <date month="September" year="2008" />
 	</front>
-	<seriesInfo name="WWW" value="http://www.ecrypt.eu.org/stream/finallist.html" />
       </reference>
 
       <reference anchor="CBC-ATTACK">
@@ -597,7 +602,7 @@ dependencies between records.
 	<seriesInfo name="International Workshop on Fast Software Encryption" value=""/>
       </reference>
 
-      <reference anchor="SALSA20-ATTACK">
+      <reference anchor="SALSA20-ATTACK" target="http://eprint.iacr.org/2007/472.pdf">
 	<front>
 	  <title>New Features of Latin Dances: Analysis of Salsa, ChaCha, and Rumba</title>
 	  <author initials="J-P." surname="Aumasson"
@@ -612,7 +617,6 @@ dependencies between records.
 		  fullname="Christian Rechberger"/>
 	  <date year="2007" />
 	</front>
-	<seriesInfo name="WWW" value="http://eprint.iacr.org/2007/472.pdf"/>
       </reference>
 
       <reference anchor="NACLCRYPTO" target="http://cr.yp.to/highspeed/naclcrypto-20090310.pdf">
@@ -623,7 +627,7 @@ dependencies between records.
         </front>
       </reference>
 
-      <reference anchor="NIST-SHA3">
+      <reference anchor="NIST-SHA3" target="http://dx.doi.org/10.6028/NIST.IR.7896">
 	<front>
 	  <title>Third-Round Report of the SHA-3
 	  Cryptographic Hash Algorithm Competition</title>
@@ -639,7 +643,6 @@ dependencies between records.
 		  fullname="Lawrence E. Bassham"/>
 	  <date year="2012" />
 	</front>
-	<seriesInfo name="WWW" value="http://dx.doi.org/10.6028/NIST.IR.7896"/>
       </reference>
 
 <!--      <reference anchor="KEY-RECOVERY-MAC">
@@ -656,7 +659,8 @@ dependencies between records.
 
     </references>
 
-    <section title="Test vectors">
+    <section title="Test vectors for ChaCha"
+        anchor="chacha-test-vectors">
       <t>
         The following blocks contain test vectors for ChaCha. The first line contains the 256-bit key, the second the 64-bit nonce and the last line contains a prefix of the resulting ChaCha key-stream.
       </t>
@@ -722,7 +726,9 @@ KEYSTREAM: f798a189f195e66982105ffb640bb7757f579da31602fc93ec01ac56
            8fab78c9
         </artwork>
       </figure>
-
+</section>
+    <section title="Test vectors for Poly1305"
+        anchor="poly1305-test-vectors">
       <t>
         The following blocks contain test vectors for Poly1305. The first line contains a variable length input. The second contains the 256-bit key and the last contains the resulting, 128-bit tag.
       </t>
@@ -746,6 +752,9 @@ TAG:   a6f745008f81c916a20dcc74eef2b2f0
         </artwork>
       </figure>
 
+</section>
+    <section title="Test vectors for AEAD_CHACHA_POLY1305"
+    	anchor="aead-chacha-poly1305-test-vectors">
       <t>
         The following block contains a test vector for the AEAD_CHACHA_POLY1305 algorithm. The first four lines consist of the standard inputs to an AEAD algorithm and the last line contains the encrypted and authenticated result.
       </t>
