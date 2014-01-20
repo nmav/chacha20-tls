@@ -131,10 +131,12 @@
       in 2008. It is a refinement of Salsa20 and was used as the core of the SHA-3 finalist, BLAKE.
       </t>
 
-      <t>The variant of ChaCha used in this draft is
-      ChaCha with 20 rounds and a 256 bit key.  This
-      is the conservative with respect to security variant of 
-      the ChaCha family.</t>
+      <t>The variant of ChaCha used in this document is
+      ChaCha with 20 rounds and a 256 bit key, which will
+      be referenced as ChaCha20 in the rest of this document.
+      This is the conservative with respect to security variant of 
+      the ChaCha family. 
+      </t>
 
       <t>
         ChaCha maps 16, 32-bit input words to 16, 32-bit output words. By convention, 8 of 
@@ -161,7 +163,7 @@
       </t>
 
       <t>
-        ChaCha consists of 20 rounds, alternating between "column" rounds and "diagonal" rounds. 
+        ChaCha20 consists of 20 rounds, alternating between "column" rounds and "diagonal" rounds. 
         Each round applies the following "quarter-round" function four times, to a different 
         set of words each time. The quarter-round function updates 4, 32-bit words (a, b, c, d) 
         as follows, where &lt;&lt;&lt; is a bitwise, left rotation:
@@ -243,9 +245,9 @@ c += d; b ^= c; b &lt;&lt;&lt;= 7;
     </section>
 
     <section anchor="chacha20suites"
-	     title="ChaCha Cipher Suites">
+	     title="ChaCha20 Cipher Suites">
       <t>In the next sections different ciphersuites are defined that utilize the
-      ChaCha cipher combined with various message authentication methods.</t>
+      ChaCha20 cipher combined with various message authentication methods.</t>
 
       <t>In all cases, the pseudorandom function (PRF) for TLS 1.2 is the TLS PRF
       with SHA-256 as the hash function.  When used with TLS versions
@@ -258,26 +260,26 @@ c += d; b ^= c; b &lt;&lt;&lt;= 7;
       target="RFC5489"/>.</t>
 
     <section anchor="chacha20suites-sha1"
-	     title="ChaCha Cipher Suites with HMAC-SHA1">
+	     title="ChaCha20 Cipher Suites with HMAC-SHA1">
 
       <t>The following CipherSuites are defined.</t>
 
       <figure>
 	<artwork><![CDATA[
-  TLS_RSA_WITH_CHACHA_SHA
-  TLS_ECDHE_RSA_WITH_CHACHA_SHA
-  TLS_ECDHE_ECDSA_WITH_CHACHA_SHA
+  TLS_RSA_WITH_CHACHA20_SHA
+  TLS_ECDHE_RSA_WITH_CHACHA20_SHA
+  TLS_ECDHE_ECDSA_WITH_CHACHA20_SHA
 
-  TLS_DHE_RSA_WITH_CHACHA_SHA
-  TLS_DHE_PSK_WITH_CHACHA_SHA
+  TLS_DHE_RSA_WITH_CHACHA20_SHA
+  TLS_DHE_PSK_WITH_CHACHA20_SHA
 
-  TLS_PSK_WITH_CHACHA_SHA
-  TLS_ECDHE_PSK_WITH_CHACHA_SHA
-  TLS_RSA_PSK_WITH_CHACHA_SHA
+  TLS_PSK_WITH_CHACHA20_SHA
+  TLS_ECDHE_PSK_WITH_CHACHA20_SHA
+  TLS_RSA_PSK_WITH_CHACHA20_SHA
 ]]></artwork>
       </figure>
 
-      <t>Note that ChaCha requires a 64-bit nonce. That nonce is
+      <t>Note that ChaCha20 requires a 64-bit nonce. That nonce is
       updated on the encryption of every TLS record, and is set to be
       the 64-bit TLS record sequence number. In case of DTLS the
       64-bit nonce is formed as the concatenation of the 16-bit epoch 
@@ -289,19 +291,19 @@ c += d; b ^= c; b &lt;&lt;&lt;= 7;
     </section>
 
     <section anchor="chacha20suites-poly1305"
-	     title="ChaCha Cipher Suites with Poly1305">
+	     title="ChaCha20 Cipher Suites with Poly1305">
       <t>
-        The ChaCha and Poly1305 primitives are built into an 
-        <xref target="RFC5116">AEAD algorithm</xref>, AEAD_CHACHA_POLY1305, that takes 
+        The ChaCha20 and Poly1305 primitives are built into an 
+        <xref target="RFC5116">AEAD algorithm</xref>, AEAD_CHACHA20_POLY1305, that takes 
         a 32 byte key and 8 byte nonce as follows.
       </t>
 
       <t>
-        ChaCha is run with the given key and nonce and with the two counter words set to zero. 
+        ChaCha20 is run with the given key and nonce and with the two counter words set to zero. 
         The first 32 bytes of the 64 byte output are saved to become the one-time key for Poly1305. 
         The remainder of the output is discarded. The first counter input word is set to one 
         and the plaintext is encrypted by XORing it with the output of invocations of the 
-        ChaCha function as needed, incrementing the first counter word after each block and 
+        ChaCha20 function as needed, incrementing the first counter word after each block and 
         overflowing into the second. The limits on the TLS plaintext size mean 
         that the first counter word will never overflow in practice.
       </t>
@@ -322,10 +324,10 @@ c += d; b ^= c; b &lt;&lt;&lt;= 7;
 
       <t>
         Authenticated decryption is largely the reverse of the encryption process: generate one 
-        block of ChaCha keystream and use the first 32 bytes as a Poly1305 key. Feed Poly1305 the 
+        block of ChaCha20 keystream and use the first 32 bytes as a Poly1305 key. Feed Poly1305 the 
         additional data and ciphertext, with the length suffixing as described above. Verify, in 
         constant time, that the calculated Poly1305 authenticator matches the final 16 bytes of 
-        the input. If not, the input can be rejected immediately. Otherwise, run ChaCha, 
+        the input. If not, the input can be rejected immediately. Otherwise, run ChaCha20, 
         starting with a counter value of one, to decrypt the ciphertext.
       </t>
 
@@ -337,7 +339,7 @@ c += d; b ^= c; b &lt;&lt;&lt;= 7;
       </t>
 
       <t>
-        In DTLS, the sequence number is only 48 bits. Thus, when used in DTLS, AEAD_CHACHA_POLY1305 
+        In DTLS, the sequence number is only 48 bits. Thus, when used in DTLS, AEAD_CHACHA20_POLY1305 
         based cipher suites use the concatenation of the 16-bit epoch with the 48-bit sequence number 
         as a replacement for TLS's 64-bit sequence number.
       </t>
@@ -345,7 +347,7 @@ c += d; b ^= c; b &lt;&lt;&lt;= 7;
       <t>
         In accordance with section 4 of <xref target="RFC5116">RFC 5116</xref>, the constants for 
         this AEAD algorithm are as follows: K_LEN is 32 bytes, N_MIN and N_MAX are 8 bytes, P_MAX 
-        and A_MAX are 2^64, C_MAX is 2^64+16. An AEAD_CHACHA_POLY1305 ciphertext is exactly 16 octets 
+        and A_MAX are 2^64, C_MAX is 2^64+16. An AEAD_CHACHA20_POLY1305 ciphertext is exactly 16 octets 
         longer than its corresponding plaintext.
       </t>
 
@@ -356,16 +358,16 @@ c += d; b ^= c; b &lt;&lt;&lt;= 7;
       <t>The following CipherSuites are defined.</t>
       <figure>
 	<artwork><![CDATA[
-  TLS_RSA_WITH_CHACHA_POLY1305_SHA256
-  TLS_ECDHE_RSA_WITH_CHACHA_POLY1305_SHA256
-  TLS_ECDHE_ECDSA_WITH_CHACHA_POLY1305_SHA256
+  TLS_RSA_WITH_CHACHA20_POLY1305_SHA256
+  TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256
+  TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256
 
-  TLS_DHE_RSA_WITH_CHACHA_POLY1305_SHA256
-  TLS_DHE_PSK_WITH_CHACHA_POLY1305_SHA256
+  TLS_DHE_RSA_WITH_CHACHA20_POLY1305_SHA256
+  TLS_DHE_PSK_WITH_CHACHA20_POLY1305_SHA256
 
-  TLS_PSK_WITH_CHACHA_POLY1305_SHA256
-  TLS_ECDHE_PSK_WITH_CHACHA_POLY1305_SHA256
-  TLS_RSA_PSK_WITH_CHACHA_POLY1305_SHA256
+  TLS_PSK_WITH_CHACHA20_POLY1305_SHA256
+  TLS_ECDHE_PSK_WITH_CHACHA20_POLY1305_SHA256
+  TLS_RSA_PSK_WITH_CHACHA20_POLY1305_SHA256
 ]]></artwork>
       </figure>
 
@@ -375,10 +377,10 @@ c += d; b ^= c; b &lt;&lt;&lt;= 7;
 
     <section anchor="updates-tls"
 	     title="Updates to the TLS Standard Stream Cipher">
-<t>The ChaCha ciphersuites with HMAC-SHA1 defined in this document differ 
+<t>The ChaCha20 ciphersuites with HMAC-SHA1 defined in this document differ 
 from the TLS RC4 ciphersuites that have been the basis for the definition of 
 Standard Stream Cipher.
-Unlike RC4, ChaCha requires a nonce per record. This however, does not affect 
+Unlike RC4, ChaCha20 requires a nonce per record. This however, does not affect 
 the description of the Standard Stream Cipher if one assumes that a nonce is
 optional and depends on the cipher's characteristics.
 </t>
@@ -387,7 +389,7 @@ Hence, this document modifies the Standard Stream Cipher by adding an
 nonce of 8-bytes, which is set to be
 the 64-bit TLS record sequence number. Stream ciphers that don't require
 a nonce such as RC4 shall ignore it. Other stream ciphers that require
-a nonce, such as ChaCha with HMAC-SHA1, will use the nonce and reset their 
+a nonce, such as ChaCha20 with HMAC-SHA1, will use the nonce and reset their 
 state on each record.
 </t>
 <t>
@@ -429,27 +431,27 @@ dependencies between records.
 
       <figure>
 	<artwork><![CDATA[
-  TLS_RSA_WITH_CHACHA_POLY1305_SHA256     = {0xTBD, 0xTBD} {0xCC, 0x12}
-  TLS_ECDHE_RSA_WITH_CHACHA_POLY1305_SHA256   = {0xTBD, 0xTBD} {0xCC, 0x13}
-  TLS_ECDHE_ECDSA_WITH_CHACHA_POLY1305_SHA256 = {0xTBD, 0xTBD} {0xCC, 0x14}
+  TLS_RSA_WITH_CHACHA20_POLY1305_SHA256     = {0xTBD, 0xTBD} {0xCC, 0x12}
+  TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256   = {0xTBD, 0xTBD} {0xCC, 0x13}
+  TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256 = {0xTBD, 0xTBD} {0xCC, 0x14}
 
-  TLS_DHE_RSA_WITH_CHACHA_POLY1305_SHA256 =     {0xTBD, 0xTBD} {0xCC, 0x15}
-  TLS_DHE_PSK_WITH_CHACHA_POLY1305_SHA256 =     {0xTBD, 0xTBD} {0xCC, 0x16}
+  TLS_DHE_RSA_WITH_CHACHA20_POLY1305_SHA256 =     {0xTBD, 0xTBD} {0xCC, 0x15}
+  TLS_DHE_PSK_WITH_CHACHA20_POLY1305_SHA256 =     {0xTBD, 0xTBD} {0xCC, 0x16}
 
-  TLS_PSK_WITH_CHACHA_POLY1305_SHA256     =     {0xTBD, 0xTBD} {0xCC, 0x17}
-  TLS_ECDHE_PSK_WITH_CHACHA_POLY1305_SHA256   = {0xTBD, 0xTBD} {0xCC, 0x18}
-  TLS_RSA_PSK_WITH_CHACHA_POLY1305_SHA256     = {0xTBD, 0xTBD} {0xCC, 0x19}
+  TLS_PSK_WITH_CHACHA20_POLY1305_SHA256     =     {0xTBD, 0xTBD} {0xCC, 0x17}
+  TLS_ECDHE_PSK_WITH_CHACHA20_POLY1305_SHA256   = {0xTBD, 0xTBD} {0xCC, 0x18}
+  TLS_RSA_PSK_WITH_CHACHA20_POLY1305_SHA256     = {0xTBD, 0xTBD} {0xCC, 0x19}
 
-  TLS_RSA_WITH_CHACHA_SHA                 = {0xTBD, 0xTBD}  {0xCC, 0x20}
-  TLS_ECDHE_RSA_WITH_CHACHA_SHA           = {0xTBD, 0xTBD}  {0xCC, 0x21}
-  TLS_ECDHE_ECDSA_WITH_CHACHA_SHA         = {0xTBD, 0xTBD}  {0xCC, 0x22}
+  TLS_RSA_WITH_CHACHA20_SHA                 = {0xTBD, 0xTBD}  {0xCC, 0x20}
+  TLS_ECDHE_RSA_WITH_CHACHA20_SHA           = {0xTBD, 0xTBD}  {0xCC, 0x21}
+  TLS_ECDHE_ECDSA_WITH_CHACHA20_SHA         = {0xTBD, 0xTBD}  {0xCC, 0x22}
 
-  TLS_DHE_RSA_WITH_CHACHA_SHA             = {0xTBD, 0xTBD}  {0xCC, 0x23}
-  TLS_DHE_PSK_WITH_CHACHA_SHA             = {0xTBD, 0xTBD}  {0xCC, 0x24}
+  TLS_DHE_RSA_WITH_CHACHA20_SHA             = {0xTBD, 0xTBD}  {0xCC, 0x23}
+  TLS_DHE_PSK_WITH_CHACHA20_SHA             = {0xTBD, 0xTBD}  {0xCC, 0x24}
 
-  TLS_PSK_WITH_CHACHA_SHA                 = {0xTBD, 0xTBD}  {0xCC, 0x25}
-  TLS_ECDHE_PSK_WITH_CHACHA_SHA           = {0xTBD, 0xTBD}  {0xCC, 0x26}
-  TLS_RSA_PSK_WITH_CHACHA_SHA             = {0xTBD, 0xTBD}  {0xCC, 0x27}
+  TLS_PSK_WITH_CHACHA20_SHA                 = {0xTBD, 0xTBD}  {0xCC, 0x25}
+  TLS_ECDHE_PSK_WITH_CHACHA20_SHA           = {0xTBD, 0xTBD}  {0xCC, 0x26}
+  TLS_RSA_PSK_WITH_CHACHA20_SHA             = {0xTBD, 0xTBD}  {0xCC, 0x27}
 ]]></artwork>
       </figure>
 
@@ -458,12 +460,12 @@ dependencies between records.
     <section anchor="security"
              title="Security Considerations">
 
-      <t>ChaCha follows the same basic principle as Salsa20, a cipher
+      <t>ChaCha20 follows the same basic principle as Salsa20, a cipher
       with significant security review <xref target="SALSA20-SECURITY"/><xref target="ESTREAM"/>.
       At the time of writing this document, there are no known significant 
-      security problems with either cipher, and ChaCha is shown to be more
+      security problems with either cipher, and ChaCha20 is shown to be more
       resistant in certain attacks than Salsa20 <xref target="SALSA20-ATTACK"/>.
-      Furthermore ChaCha was used as the core of the BLAKE hash function,
+      Furthermore ChaCha20 was used as the core of the BLAKE hash function,
       a SHA3 finalist, that had received considerable cryptanalytic
       attention <xref target="NIST-SHA3"/>.
       </t>
@@ -482,7 +484,7 @@ dependencies between records.
 
       <t>This document should not introduce any other security
       considerations than those that directly follow from the use of
-      the stream cipher ChaCha, the AEAD_CHACHA_POLY1305 construction, and 
+      the stream cipher ChaCha20, the AEAD_CHACHA20_POLY1305 construction, and 
       those that directly follow from introducing any set of stream cipher 
       suites into TLS and DTLS.</t>
 
@@ -660,10 +662,11 @@ dependencies between records.
 
     </references>
 
-    <section title="Test vectors for ChaCha"
+    <section title="Test vectors">
+    <section title="ChaCha20"
         anchor="chacha-test-vectors">
       <t>
-        The following blocks contain test vectors for ChaCha. The first line contains the 256-bit key, the second the 64-bit nonce and the last line contains a prefix of the resulting ChaCha key-stream.
+        The following blocks contain test vectors for ChaCha20. The first line contains the 256-bit key, the second the 64-bit nonce and the last line contains a prefix of the resulting ChaCha20 key-stream.
       </t>
 
       <figure>
@@ -728,7 +731,7 @@ KEYSTREAM: f798a189f195e66982105ffb640bb7757f579da31602fc93ec01ac56
         </artwork>
       </figure>
 </section>
-    <section title="Test vectors for Poly1305"
+    <section title="Poly1305"
         anchor="poly1305-test-vectors">
       <t>
         The following blocks contain test vectors for Poly1305. The first line contains a variable length input. The second contains the 256-bit key and the last contains the resulting, 128-bit tag.
@@ -754,10 +757,10 @@ TAG:   a6f745008f81c916a20dcc74eef2b2f0
       </figure>
 
 </section>
-    <section title="Test vectors for AEAD_CHACHA_POLY1305"
+    <section title="AEAD_CHACHA20_POLY1305"
     	anchor="aead-chacha-poly1305-test-vectors">
       <t>
-        The following block contains a test vector for the AEAD_CHACHA_POLY1305 algorithm. The first four lines consist of the standard inputs to an AEAD algorithm and the last line contains the encrypted and authenticated result.
+        The following block contains a test vector for the AEAD_CHACHA20_POLY1305 algorithm. The first four lines consist of the standard inputs to an AEAD algorithm and the last line contains the encrypted and authenticated result.
       </t>
 
       <figure>
@@ -772,7 +775,7 @@ OUTPUT: e3e446f7ede9a19b62a4677dabf4e3d24b876bb284753896e1d6
       </figure>
 
       <t>
-        To aid implementations, the next block contains some intermediate values in the AEAD_CHACHA_POLY1305 algorithm. The first line contains the Poly1305 key that is derived and the second contains the raw bytes that are authenticated by Poly1305.
+        To aid implementations, the next block contains some intermediate values in the AEAD_CHACHA20_POLY1305 algorithm. The first line contains the Poly1305 key that is derived and the second contains the raw bytes that are authenticated by Poly1305.
       </t>
 
       <figure>
@@ -783,6 +786,7 @@ INPUT: 87e229d4500845a079c00a00000000000000e3e446f7ede9a19b62a40a00
        000000000000
         </artwork>
       </figure>
+    </section>
     </section>
 
   </back>
