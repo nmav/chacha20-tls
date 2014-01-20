@@ -339,9 +339,8 @@ c += d; b ^= c; b &lt;&lt;&lt;= 7;
       </t>
 
       <t>
-        In DTLS, the sequence number is only 48 bits. Thus, when used in DTLS, AEAD_CHACHA20_POLY1305 
-        based cipher suites use the concatenation of the 16-bit epoch with the 48-bit sequence number 
-        as a replacement for TLS's 64-bit sequence number.
+        In DTLS, the nonce is formed as the concatenation of the 16-bit epoch with the 
+        48-bit sequence number.
       </t>
 
       <t>
@@ -402,12 +401,12 @@ record.
 	     title="Updates to DTLS">
 <t>
 The DTLS protocol requires the cipher in use to introduce no dependencies
-between TLS Records (i.e., to allow lost or rearranged records). For that
+between TLS Records to allow lost or rearranged records. For that
 it explicitly bans stream ciphers (see Section 3.1 of <xref
 target="RFC6347"/>).
 </t>
 <t>
-As the stream ciphers described in this document, unlike RC4, do not require 
+As the stream cipher described in this document, unlike RC4, does not require 
 dependencies between records, this ban of stream ciphers is lifted with
 this document. Stream ciphers can be used with DTLS if they introduce no
 dependencies between records.
