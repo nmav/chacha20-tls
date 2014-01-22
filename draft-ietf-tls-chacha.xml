@@ -84,7 +84,7 @@
     <section anchor="intro"
              title="Introduction">
 
-      <t>This document describes the use of the ChaCha stream 
+      <t>This document describes the use of the ChaCha stream cipher
       in the Transport Layer Security (TLS) version 1.0 <xref
       target="RFC2246"/>, TLS version 1.1 <xref target="RFC4346"/>,
       and TLS version 1.2 <xref target="RFC5246"/> protocols, as well
@@ -133,8 +133,8 @@
 
       <t>The variant of ChaCha used in this document is
       ChaCha with 20 rounds and a 256 bit key, which will
-      be referenced as ChaCha20 in the rest of this document.
-      This is the conservative with respect to security variant of 
+      be referred to as ChaCha20 in the rest of this document.
+      This is the conservative variant (with respect to security) of 
       the ChaCha family. 
       </t>
 
@@ -385,8 +385,13 @@ optional and depends on the cipher's characteristics.
 </t>
 <t>
 Hence, this document modifies the Standard Stream Cipher by adding an
-nonce of 8-bytes, which is set to be
-the 64-bit TLS record sequence number. Stream ciphers that don't require
+implicit nonce of 8-bytes, which is set to be the 64-bit TLS record sequence number.
+If the stream cipher needs more than 8 byte of nonce, it can obtain
+additional bytes for the implicit nonce from the client_write_iv
+and server_write_iv of the key_block.
+</t>
+<t>
+Stream ciphers that don't require
 a nonce such as RC4 shall ignore it. Other stream ciphers that require
 a nonce, such as ChaCha20 with HMAC-SHA1, will use the nonce and reset their 
 state on each record.
@@ -424,7 +429,10 @@ dependencies between records.
     <section anchor="iana"
              title="IANA Considerations">
 
-      <t>IANA is requested to allocate the following numbers in the
+<t>
+   IANA is requested to assign a value for AEAD_CHACHA20_POLY1305 in the
+      <xref target="RFC5116">registry of AEAD algorithms</xref>, and
+      also allocate the following Cipher Suites in the
       TLS Cipher Suite Registry (note that the third column
       contains the suggested ciphersuite numbers):</t>
 
