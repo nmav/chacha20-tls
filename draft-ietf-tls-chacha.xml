@@ -10,7 +10,7 @@
 <!ENTITY RFC5116 SYSTEM 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.5116.xml'>
 <!ENTITY RFC6101 SYSTEM 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.6101.xml'>
 <!ENTITY RFC6234 SYSTEM 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.6234.xml'>
-<!-- <!ENTITY CHACHAVECTORS SYSTEM 'http://xml.resource.org/public/rfc/bibxml-ids/reference.I-D.draft-strombergson-chacha-test-vectors-00.xml'>-->
+<!ENTITY CHACHAPOLY SYSTEM 'http://xml.resource.org/public/rfc/bibxml-ids/reference.I-D.draft-nir-cfrg-chacha20-poly1305-01.xml'>
 ]>
 
 <?rfc compact="no"?>
@@ -18,7 +18,7 @@
 <?rfc symrefs="yes"?>
 
 <rfc category="std" ipr="trust200902"
-    updates="5246, 6347"  docName="draft-mavrogiannopoulos-chacha-tls-01">
+    updates="5246, 6347"  docName="draft-mavrogiannopoulos-chacha-tls-02">
 
   <front>
 
@@ -135,76 +135,9 @@
       ChaCha with 20 rounds and a 256 bit key, which will
       be referred to as ChaCha20 in the rest of this document.
       This is the conservative variant (with respect to security) of 
-      the ChaCha family. 
+      the ChaCha family and is described in <xref target="I-D.nir-cfrg-chacha20-poly1305"/>.
       </t>
 
-      <t>
-        ChaCha maps 16, 32-bit input words to 16, 32-bit output words. By convention, 8 of 
-        the input words consist of a 256-bit key, 4 are constants and the remaining four are 
-        a nonce and block counter. The output words are converted to bytes and XORed with the
-        plaintext to produce ciphertext. In order to generate sufficient output bytes to XOR 
-        with the whole plaintext, the block counter is incremented and ChaCha is run again, 
-        as many times as needed, for up to 2^70 bytes of output.
-      </t>
-
-      <t>
-        ChaCha operates on a state of 16, 32-bit words which are initialised from the input 
-        words. The first four input words are constants: 
-      <figure>
-	<artwork><![CDATA[
-          (0x61707865, 0x3320646e, 0x79622d32, 0x6b206574)
-]]></artwork>
-      </figure>
-        Input words 4 through 11 are taken from the 256-bit key by reading the bytes in 
-        little-endian order, in 4-byte chunks. Input words 12 and 13 are a block counter, 
-        with word 12 overflowing into word 13. Lastly, words 14 and 15 are taken from 
-        an 8-byte nonce, again by reading the bytes in little-endian order, in 4-byte 
-        chunks. The block counter words are initially zero.
-      </t>
-
-      <t>
-        ChaCha20 consists of 20 rounds, alternating between "column" rounds and "diagonal" rounds. 
-        Each round applies the following "quarter-round" function four times, to a different 
-        set of words each time. The quarter-round function updates 4, 32-bit words (a, b, c, d) 
-        as follows, where &lt;&lt;&lt; is a bitwise, left rotation:
-      </t>
-
-      <figure>
-        <artwork>
-a += b; d ^= a; d &lt;&lt;&lt;= 16;
-c += d; b ^= c; b &lt;&lt;&lt;= 12;
-a += b; d ^= a; d &lt;&lt;&lt;= 8;
-c += d; b ^= c; b &lt;&lt;&lt;= 7;
-        </artwork>
-      </figure>
-
-      <t>
-        The 16 words are conceptually arranged in a four by four grid with the first word in 
-        the top-left position and the fourth word in the top-right position. The "column" rounds 
-        then apply the quarter-round function to the four columns, from left to right. The 
-        "diagonal" rounds apply the quarter-round to the top-left, bottom-right diagonal, 
-        followed by the pattern shifted one place to the right, for three more quarter-rounds.
-      </t>
-
-      <t>
-        Specifically, a column round applies the quarter-round function to the following 
-        indexes: (0, 4, 8, 12), (1, 5, 9, 13), (2, 6, 10, 14), (3, 7, 11, 15). A diagonal 
-        round applies it to these indexes: (0, 5, 10, 15), (1, 6, 11, 12), (2, 7, 8, 13), 
-        (3, 4, 9, 14).
-      </t>
-
-      <t>
-        After 20 rounds of the above processing, the original 16 input words are added to 
-        the 16 words to form the 16 output words.
-      </t>
-
-      <t>
-        The 64 output bytes are generated from the 16 output words by
-        serializing them in little-endian order and concatenating the results.
-      </t>
-      <t>
-       Test vectors for this cipher can be found in <xref target="chacha-test-vectors"/>.
-      </t>
     </section>
 
     <section title="The Poly1305 Authenticator">
@@ -213,34 +146,8 @@ c += d; b ^= c; b &lt;&lt;&lt;= 7;
         designed by D. J. Bernstein. Poly1305 takes a 32-byte, one-time key and a message 
         and produces a 16-byte tag that authenticates the message such that an attacker has 
         a negligible chance of producing a valid tag for an inauthentic message.
-      </t>
+        It is described in <xref target="I-D.nir-cfrg-chacha20-poly1305"/>.
 
-      <t>
-        The first 16 bytes of the one-time key form an integer, <spanx style="emph">r</spanx>, 
-        as follows: the top four bits of the bytes at indexes 3, 7, 11 and 15 are cleared, 
-        the bottom 2 bits of the bytes at indexes 4, 8 and 12 are cleared and the 16 bytes 
-        are taken as a little-endian value.
-      </t>
-
-      <t>
-        An accumulator is set to zero. For each chunk of 16 bytes from the input message, 
-        a byte with value 1 is appended and the 17 bytes are treated as a little-endian 
-        number. If the last chunk has less than 16 bytes then zero bytes are appended after 
-        the 1 byte is appended until there are 17 bytes. The value is added to the 
-        accumulator and then the accumulator is multiplied by <spanx style="emph">r</spanx>, 
-        all mod 2^130 - 5.
-      </t>
-
-      <t>
-        Finally the last 16 bytes of the one-time key are treated as a little-endian number 
-        and added to the accumulator, mod 2^128. The result is serialised as a little-endian 
-        number, producing the 16 byte tag. Note that the original specification of Poly1305 
-        used a different construction with AES to generate the constant term of the polynomial 
-        from a counter nonce. For a more recent treatment that avoids the use of a block cipher 
-        in this fashion, as is done here, see section 9 of <xref target="NACLCRYPTO">the NaCl specification</xref>.
-      </t>
-      <t>
-       Test vectors for this authenticator can be found in <xref target="poly1305-test-vectors"/>.
       </t>
     </section>
 
@@ -279,11 +186,11 @@ c += d; b ^= c; b &lt;&lt;&lt;= 7;
 ]]></artwork>
       </figure>
 
-      <t>Note that ChaCha20 requires a 64-bit nonce. That nonce is
+      <t>Note that ChaCha20 as in <xref target="I-D.nir-cfrg-chacha20-poly1305"/> requires a 96-bit nonce. That nonce is
       updated on the encryption of every TLS record, and is set to be
-      the 64-bit TLS record sequence number. In case of DTLS the
-      64-bit nonce is formed as the concatenation of the 16-bit epoch 
-      with the 48-bit sequence number.</t>
+      the 64-bit TLS record sequence number left padded with zeros. In case of DTLS the
+      nonce is formed as the concatenation of the 16-bit epoch 
+      with the 48-bit sequence number, left padded with zeros.</t>
 
       <t>The MAC algorithm used in the ciphersuites above is HMAC-SHA1 <xref
       target="RFC6234"/>.</t>
@@ -294,64 +201,22 @@ c += d; b ^= c; b &lt;&lt;&lt;= 7;
 	     title="ChaCha20 Cipher Suites with Poly1305">
       <t>
         The ChaCha20 and Poly1305 primitives are built into an 
-        <xref target="RFC5116">AEAD algorithm</xref>, AEAD_CHACHA20_POLY1305, that takes 
-        a 32 byte key and 8 byte nonce as follows.
-      </t>
-
-      <t>
-        ChaCha20 is run with the given key and nonce and with the two counter words set to zero. 
-        The first 32 bytes of the 64 byte output are saved to become the one-time key for Poly1305. 
-        The remainder of the output is discarded. The first counter input word is set to one 
-        and the plaintext is encrypted by XORing it with the output of invocations of the 
-        ChaCha20 function as needed, incrementing the first counter word after each block and 
-        overflowing into the second. The limits on the TLS plaintext size mean 
-        that the first counter word will never overflow in practice.
-      </t>
-
-      <t>
-        The reason for generating the Poly1305 key like this rather than using key material 
-        from the handshake is that handshake key material is per-session, but for a polynomial 
-        MAC, a unique, secret key is needed per-record.
-      </t>
-
-      <t>
-        The Poly1305 key is used to calculate a tag for the following input: the concatenation 
-        of the additional data, the number of bytes of additional data, the ciphertext and the 
-        number of bytes of ciphertext. Numbers are represented as 8-byte, little-endian values. 
-        The resulting tag is appended to the ciphertext, resulting in the output of the AEAD 
-        operation.
-      </t>
-
-      <t>
-        Authenticated decryption is largely the reverse of the encryption process: generate one 
-        block of ChaCha20 keystream and use the first 32 bytes as a Poly1305 key. Feed Poly1305 the 
-        additional data and ciphertext, with the length suffixing as described above. Verify, in 
-        constant time, that the calculated Poly1305 authenticator matches the final 16 bytes of 
-        the input. If not, the input can be rejected immediately. Otherwise, run ChaCha20, 
-        starting with a counter value of one, to decrypt the ciphertext.
+        <xref target="RFC5116">AEAD algorithm</xref>, AEAD_CHACHA20_POLY1305,
+        described in <xref target="I-D.nir-cfrg-chacha20-poly1305"/>.  It takes as input
+        a 256-bit key and 96-bit nonce.
       </t>
 
       <t>
         When used in TLS, the <spanx style="verb">record_iv_length</spanx> is zero and the nonce is 
-        the sequence number for the record, as an 8-byte, big-endian number. The additional data is 
+        the sequence number for the record, as an 8-byte, big-endian number,
+        left padded with zeros. The additional data is 
         seq_num + TLSCompressed.type + TLSCompressed.version + TLSCompressed.length, where "+" denotes
         concatenation.
       </t>
 
       <t>
         In DTLS, the nonce is formed as the concatenation of the 16-bit epoch with the 
-        48-bit sequence number.
-      </t>
-
-      <t>
-        In accordance with section 4 of <xref target="RFC5116">RFC 5116</xref>, the constants for 
-        this AEAD algorithm are as follows: K_LEN is 32 bytes, N_MIN and N_MAX are 8 bytes, P_MAX 
-        and A_MAX are 2^64, C_MAX is 2^64+16. An AEAD_CHACHA20_POLY1305 ciphertext is exactly 16 octets 
-        longer than its corresponding plaintext.
-      </t>
-
-      <t>
-       Test vectors for this authenticator can be found in <xref target="aead-chacha-poly1305-test-vectors"/>.
+        48-bit sequence number, left padded with zeros.
       </t>
 
       <t>The following CipherSuites are defined.</t>
@@ -386,7 +251,8 @@ optional and depends on the cipher's characteristics.
 <t>
 Hence, this document modifies the Standard Stream Cipher by adding an
 implicit nonce of 8-bytes, which is set to be the 64-bit TLS record sequence number.
-If the stream cipher needs more than 8 byte of nonce, it can obtain
+If the stream cipher needs more than 8 byte of nonce, it can either
+pad the implicit nonce with zeros, or obtain
 additional bytes for the implicit nonce from the client_write_iv
 and server_write_iv of the key_block.
 </t>
@@ -493,7 +359,8 @@ dependencies between records.
       considerations than those that directly follow from the use of
       the stream cipher ChaCha20, the AEAD_CHACHA20_POLY1305 construction, and 
       those that directly follow from introducing any set of stream cipher 
-      suites into TLS and DTLS.</t>
+      suites into TLS and DTLS (see also the Security Considerations section
+      of <xref target="I-D.nir-cfrg-chacha20-poly1305"/>).</t>
 
     </section>
     
@@ -534,7 +401,7 @@ dependencies between records.
 
     <references title="Informative References">
     
-<!--      &CHACHAVECTORS;-->
+      &CHACHAPOLY;
 
       <reference anchor="SALSA20SPEC" target="http://cr.yp.to/snuffle/spec.pdf">
 	<front>
