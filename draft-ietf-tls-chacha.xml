@@ -496,14 +496,6 @@ dependencies between records.
 	</front>
       </reference>
 
-      <reference anchor="NACLCRYPTO" target="http://cr.yp.to/highspeed/naclcrypto-20090310.pdf">
-        <front>
-          <title>Cryptography in NaCl</title>
-          <author initials="D. J." surname="Bernstein"></author>
-          <date month="March" year="2009"/>
-        </front>
-      </reference>
-
       <reference anchor="NIST-SHA3" target="http://dx.doi.org/10.6028/NIST.IR.7896">
 	<front>
 	  <title>Third-Round Report of the SHA-3
