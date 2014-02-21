@@ -1,4 +1,4 @@
-all: draft-ietf-tls-chacha-00.txt draft-mavrogiannopoulos-chacha-tls-02.txt
+all: draft-mavrogiannopoulos-chacha-tls-02.txt #draft-ietf-tls-chacha-00.txt 
 
 draft-ietf-tls-chacha-00.txt: draft-ietf-tls-chacha.xml
 	xml2rfc $^

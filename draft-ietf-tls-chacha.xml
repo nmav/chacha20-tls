@@ -132,7 +132,7 @@
       </t>
 
       <t>The variant of ChaCha used in this document is
-      ChaCha with 20 rounds and a 256 bit key, which will
+      ChaCha with 20 rounds, a 96-bit nonce and a 256 bit key, which will
       be referred to as ChaCha20 in the rest of this document.
       This is the conservative variant (with respect to security) of 
       the ChaCha family and is described in <xref target="I-D.nir-cfrg-chacha20-poly1305"/>.
@@ -156,7 +156,32 @@
       <t>In the next sections different ciphersuites are defined that utilize the
       ChaCha20 cipher combined with various message authentication methods.</t>
 
-      <t>In all cases, the pseudorandom function (PRF) for TLS 1.2 is the TLS PRF
+      <t>In all cases, the ChaCha20 cipher, as in <xref
+      target="I-D.nir-cfrg-chacha20-poly1305"/>, uses a 96-bit nonce.
+      That nonce is updated on the encryption of every TLS record, and is formed as
+      follows.
+      </t>
+
+      <figure>
+	<artwork><![CDATA[
+    struct {
+        opaque salt[4];
+        opaque counter[8];
+    } ChaChaNonce;
+]]></artwork>
+      </figure>
+      <t>
+      The salt is generated as part of the handshake process. It is either
+      the client_write_IV (when the client is sending) or the server_write_IV 
+      (when the server is sending).  The salt length (SecurityParameters.fixed_iv_length) 
+      is 4 bytes. The counter is the 64-bit TLS record sequence number. In case of DTLS the
+      counter is formed as the concatenation of the 16-bit epoch 
+      with the 48-bit sequence number.</t>
+      <t>
+      In both TLS and DTLS the ChaChaNonce is implicit and not sent as part of the packet.
+      </t>
+
+      <t>The pseudorandom function (PRF) for TLS 1.2 is the TLS PRF
       with SHA-256 as the hash function.  When used with TLS versions
       prior to 1.2, the PRF is calculated as specified in the
       appropriate version of the TLS specification.</t>
@@ -186,12 +211,6 @@
 ]]></artwork>
       </figure>
 
-      <t>Note that ChaCha20 as in <xref target="I-D.nir-cfrg-chacha20-poly1305"/> requires a 96-bit nonce. That nonce is
-      updated on the encryption of every TLS record, and is set to be
-      the 64-bit TLS record sequence number left padded with zeros. In case of DTLS the
-      nonce is formed as the concatenation of the 16-bit epoch 
-      with the 48-bit sequence number, left padded with zeros.</t>
-
       <t>The MAC algorithm used in the ciphersuites above is HMAC-SHA1 <xref
       target="RFC6234"/>.</t>
 
@@ -203,20 +222,14 @@
         The ChaCha20 and Poly1305 primitives are built into an 
         <xref target="RFC5116">AEAD algorithm</xref>, AEAD_CHACHA20_POLY1305,
         described in <xref target="I-D.nir-cfrg-chacha20-poly1305"/>.  It takes as input
-        a 256-bit key and 96-bit nonce.
+        a 256-bit key and a 96-bit nonce.
       </t>
 
       <t>
-        When used in TLS, the <spanx style="verb">record_iv_length</spanx> is zero and the nonce is 
-        the sequence number for the record, as an 8-byte, big-endian number,
-        left padded with zeros. The additional data is 
+        When used in TLS, the <spanx style="verb">record_iv_length</spanx> is zero and the nonce is
+        set to be the ChaChaNonce. The additional data is 
         seq_num + TLSCompressed.type + TLSCompressed.version + TLSCompressed.length, where "+" denotes
         concatenation.
-      </t>
-
-      <t>
-        In DTLS, the nonce is formed as the concatenation of the 16-bit epoch with the 
-        48-bit sequence number, left padded with zeros.
       </t>
 
       <t>The following CipherSuites are defined.</t>
@@ -250,11 +263,8 @@ optional and depends on the cipher's characteristics.
 </t>
 <t>
 Hence, this document modifies the Standard Stream Cipher by adding an
-implicit nonce of 8-bytes, which is set to be the 64-bit TLS record sequence number.
-If the stream cipher needs more than 8 byte of nonce, it can either
-pad the implicit nonce with zeros, or obtain
-additional bytes for the implicit nonce from the client_write_iv
-and server_write_iv of the key_block.
+implicit nonce of 96-bits, which is set to be the concatenation of
+a salt, generated from the key_block, with the 64-bit TLS record sequence number.
 </t>
 <t>
 Stream ciphers that don't require
@@ -263,7 +273,7 @@ a nonce, such as ChaCha20 with HMAC-SHA1, will use the nonce and reset their
 state on each record.
 </t>
 <t>
-Note that in case of DTLS the 8-byte nonce is formed as the concatenation of the 
+Note that in case of DTLS the 8-byte counter part of the nonce is formed as the concatenation of the 
 16-bit epoch with the 48-bit sequence number, which are sent as part of the
 record.
 </t>
