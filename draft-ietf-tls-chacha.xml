@@ -166,7 +166,7 @@
 	<artwork><![CDATA[
     struct {
         opaque salt[4];
-        opaque counter[8];
+        opaque record_counter[8];
     } ChaChaNonce;
 ]]></artwork>
       </figure>
@@ -174,8 +174,8 @@
       The salt is generated as part of the handshake process. It is either
       the client_write_IV (when the client is sending) or the server_write_IV 
       (when the server is sending).  The salt length (SecurityParameters.fixed_iv_length) 
-      is 4 bytes. The counter is the 64-bit TLS record sequence number. In case of DTLS the
-      counter is formed as the concatenation of the 16-bit epoch 
+      is 4 bytes. The record_counter is the 64-bit TLS record sequence number. In case of DTLS the
+      record_counter is formed as the concatenation of the 16-bit epoch 
       with the 48-bit sequence number.</t>
       <t>
       In both TLS and DTLS the ChaChaNonce is implicit and not sent as part of the packet.
@@ -263,19 +263,19 @@ optional and depends on the cipher's characteristics.
 </t>
 <t>
 Hence, this document modifies the Standard Stream Cipher by adding an
-implicit nonce of 96-bits, which is set to be the concatenation of
-a salt, generated from the key_block, with the 64-bit TLS record sequence number.
+implicit nonce. The implicit nonce may consist of
+ <list style='symbols'>
+ <t>an optional fixed component ("salt"), generated from the key_block;</t>
+ <t>a variable component, based on the 64-bit TLS record sequence
+ number or the concatenation of the 16-bit epoch with the 48-bit sequence number in case of
+ DTLS.</t>
+ </list>
 </t>
 <t>
 Stream ciphers that don't require
 a nonce such as RC4 shall ignore it. Other stream ciphers that require
 a nonce, such as ChaCha20 with HMAC-SHA1, will use the nonce and reset their 
 state on each record.
-</t>
-<t>
-Note that in case of DTLS the 8-byte counter part of the nonce is formed as the concatenation of the 
-16-bit epoch with the 48-bit sequence number, which are sent as part of the
-record.
 </t>
    </section>
     <section anchor="updates-dtls"
