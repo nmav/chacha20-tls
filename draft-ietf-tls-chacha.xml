@@ -306,10 +306,8 @@ dependencies between records.
              title="IANA Considerations">
 
 <t>
-   IANA is requested to assign a value for AEAD_CHACHA20_POLY1305 in the
-      <xref target="RFC5116">registry of AEAD algorithms</xref>, and
-      also allocate the following Cipher Suites in the
-      TLS Cipher Suite Registry:</t>
+   IANA is requested to assign 
+      the following Cipher Suites in the TLS Cipher Suite Registry:</t>
 
       <figure>
 	<artwork><![CDATA[
@@ -383,12 +381,18 @@ dependencies between records.
       &RFC4346;
       &RFC4347;
       &RFC4492;
-      &RFC5116;
       &RFC5246;
       &RFC5489;
       &RFC6234;
       &RFC6347;
       
+      &CHACHAPOLY;
+
+
+    </references>
+
+    <references title="Informative References">
+
       <reference anchor="CHACHA" target="http://cr.yp.to/chacha/chacha-20080128.pdf">
 	<front>
 	  <title>ChaCha, a variant of Salsa20</title>
@@ -405,12 +409,8 @@ dependencies between records.
           <date month="March" year="2005"/>
         </front>
       </reference>
-
-    </references>
-
-    <references title="Informative References">
     
-      &CHACHAPOLY;
+      &RFC5116;
 
       <reference anchor="SALSA20SPEC" target="http://cr.yp.to/snuffle/spec.pdf">
 	<front>
