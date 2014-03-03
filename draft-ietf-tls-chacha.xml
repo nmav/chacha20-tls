@@ -356,7 +356,7 @@ dependencies between records.
         a 16*n byte message, even after sending 2^64 legitimate messages.
       </t>
       <t>
-        The cipher suites described in this document require that an nonce
+        The cipher suites described in this document require that a nonce
         is never repeated under the same key. The design presented ensures
         that by using the TLS sequence number which is unique and does not
         wrap <xref target="RFC5246"/>.
