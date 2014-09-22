@@ -10,7 +10,7 @@
 <!ENTITY RFC5116 SYSTEM 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.5116.xml'>
 <!ENTITY RFC6101 SYSTEM 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.6101.xml'>
 <!ENTITY RFC6234 SYSTEM 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.6234.xml'>
-<!ENTITY CHACHAPOLY SYSTEM 'http://xml.resource.org/public/rfc/bibxml-ids/reference.I-D.draft-nir-cfrg-chacha20-poly1305-01.xml'>
+<!ENTITY CHACHAPOLY SYSTEM 'http://xml.resource.org/public/rfc/bibxml-ids/reference.I-D.draft-irtf-cfrg-chacha20-poly1305-01.xml'>
 ]>
 
 <?rfc compact="no"?>
@@ -135,7 +135,7 @@
       ChaCha with 20 rounds, a 96-bit nonce and a 256 bit key, which will
       be referred to as ChaCha20 in the rest of this document.
       This is the conservative variant (with respect to security) of 
-      the ChaCha family and is described in <xref target="I-D.nir-cfrg-chacha20-poly1305"/>.
+      the ChaCha family and is described in <xref target="I-D.irtf-cfrg-chacha20-poly1305"/>.
       </t>
 
     </section>
@@ -146,7 +146,7 @@
         designed by D. J. Bernstein. Poly1305 takes a 32-byte, one-time key and a message 
         and produces a 16-byte tag that authenticates the message such that an attacker has 
         a negligible chance of producing a valid tag for an inauthentic message.
-        It is described in <xref target="I-D.nir-cfrg-chacha20-poly1305"/>.
+        It is described in <xref target="I-D.irtf-cfrg-chacha20-poly1305"/>.
 
       </t>
     </section>
@@ -157,7 +157,7 @@
       ChaCha20 cipher combined with various message authentication methods.</t>
 
       <t>In all cases, the ChaCha20 cipher, as in <xref
-      target="I-D.nir-cfrg-chacha20-poly1305"/>, uses a 96-bit nonce.
+      target="I-D.irtf-cfrg-chacha20-poly1305"/>, uses a 96-bit nonce.
       That nonce is updated on the encryption of every TLS record, and is formed as
       follows.
       </t>
@@ -221,7 +221,7 @@
       <t>
         The ChaCha20 and Poly1305 primitives are built into an 
         <xref target="RFC5116">AEAD algorithm</xref>, AEAD_CHACHA20_POLY1305,
-        described in <xref target="I-D.nir-cfrg-chacha20-poly1305"/>.  It takes as input
+        described in <xref target="I-D.irtf-cfrg-chacha20-poly1305"/>.  It takes as input
         a 256-bit key and a 96-bit nonce.
       </t>
 
@@ -367,7 +367,7 @@ dependencies between records.
       the stream cipher ChaCha20, the AEAD_CHACHA20_POLY1305 construction, and 
       those that directly follow from introducing any set of stream cipher 
       suites into TLS and DTLS (see also the Security Considerations section
-      of <xref target="I-D.nir-cfrg-chacha20-poly1305"/>).</t>
+      of <xref target="I-D.irtf-cfrg-chacha20-poly1305"/>).</t>
 
     </section>
     
