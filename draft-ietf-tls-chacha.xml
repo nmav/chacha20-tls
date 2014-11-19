@@ -1,14 +1,10 @@
 <?xml version="1.0"?>
 <!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
-<!ENTITY RFC2246 SYSTEM 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2246.xml'>
-<!ENTITY RFC4346 SYSTEM 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.4346.xml'>
 <!ENTITY RFC5246 SYSTEM 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.5246.xml'>
-<!ENTITY RFC4347 SYSTEM 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.4347.xml'>
 <!ENTITY RFC6347 SYSTEM 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.6347.xml'>
 <!ENTITY RFC4492 SYSTEM 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.4492.xml'>
 <!ENTITY RFC5489 SYSTEM 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.5489.xml'>
 <!ENTITY RFC5116 SYSTEM 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.5116.xml'>
-<!ENTITY RFC6101 SYSTEM 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.6101.xml'>
 <!ENTITY CHACHAPOLY SYSTEM 'http://xml.resource.org/public/rfc/bibxml-ids/reference.I-D.draft-irtf-cfrg-chacha20-poly1305-03.xml'>
 ]>
 
@@ -71,7 +67,7 @@
     <abstract>
 
       <t>This document describes the use of the ChaCha stream cipher
-      Poly1305 in Transport Layer Security (TLS) and Datagram
+      with Poly1305 in Transport Layer Security (TLS) and Datagram
       Transport Layer Security (DTLS) protocols.</t>
 
     </abstract>
@@ -84,13 +80,9 @@
              title="Introduction">
 
       <t>This document describes the use of the ChaCha stream cipher
-      in the Transport Layer Security (TLS) version 1.0 <xref
-      target="RFC2246"/>, TLS version 1.1 <xref target="RFC4346"/>,
-      and TLS version 1.2 <xref target="RFC5246"/> protocols, as well
-      as in the Datagram Transport Layer Security (DTLS) versions 1.0
-      <xref target="RFC4347"/> and 1.2 <xref target="RFC6347"/>.  It
-      can also be used with Secure Sockets Layer (SSL) version 3.0
-      <xref target="RFC6101"/>.</t>
+      in the Transport Layer Security (TLS) version 1.2 <xref target="RFC5246"/>
+      protocol, as well as in the Datagram Transport Layer Security (DTLS)
+      version 1.2 <xref target="RFC6347"/>, or any later versions.</t>
 
       <t><xref target="CHACHA">ChaCha</xref> is a stream cipher
       that has been designed for high performance in software
@@ -181,9 +173,7 @@
       </t>
 
       <t>The pseudorandom function (PRF) for TLS 1.2 is the TLS PRF
-      with SHA-256 as the hash function.  When used with TLS versions
-      prior to 1.2, the PRF is calculated as specified in the
-      appropriate version of the TLS specification.</t>
+      with SHA-256 as the hash function.  </t>
 
       <t>The RSA, DHE_RSA, ECDHE_RSA, ECDHE_ECDSA, PSK, DHE_PSK,
       RSA_PSK, ECDHE_PSK key exchanges are performed as defined in
@@ -297,9 +287,6 @@
 
     <references title="Normative References">
 
-      &RFC2246;
-      &RFC4346;
-      &RFC4347;
       &RFC4492;
       &RFC5246;
       &RFC5489;
@@ -339,8 +326,6 @@
 	  <date month="April" year="2005" />
 	</front>
       </reference>
-
-      &RFC6101;
 
       <reference anchor="SALSA20-SECURITY" target="http://cr.yp.to/snuffle/security.pdf">
 	<front>
