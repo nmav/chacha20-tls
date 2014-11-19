@@ -9,7 +9,6 @@
 <!ENTITY RFC5489 SYSTEM 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.5489.xml'>
 <!ENTITY RFC5116 SYSTEM 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.5116.xml'>
 <!ENTITY RFC6101 SYSTEM 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.6101.xml'>
-<!ENTITY RFC6234 SYSTEM 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.6234.xml'>
 <!ENTITY CHACHAPOLY SYSTEM 'http://xml.resource.org/public/rfc/bibxml-ids/reference.I-D.draft-irtf-cfrg-chacha20-poly1305-01.xml'>
 ]>
 
@@ -18,7 +17,7 @@
 <?rfc symrefs="yes"?>
 
 <rfc category="std" ipr="trust200902"
-    updates="5246, 6347"  docName="draft-mavrogiannopoulos-chacha-tls-03">
+    updates="5246, 6347"  docName="draft-mavrogiannopoulos-chacha-tls-04">
 
   <front>
 
@@ -71,8 +70,8 @@
 
     <abstract>
 
-      <t>This document describes the use of the ChaCha stream cipher with
-      HMAC-SHA1 and Poly1305 in Transport Layer Security (TLS) and Datagram
+      <t>This document describes the use of the ChaCha stream cipher
+      Poly1305 in Transport Layer Security (TLS) and Datagram
       Transport Layer Security (DTLS) protocols.</t>
 
     </abstract>
@@ -191,31 +190,6 @@
       <xref target="RFC5246"/>, <xref target="RFC4492"/>, and <xref
       target="RFC5489"/>.</t>
 
-    <section anchor="chacha20suites-sha1"
-	     title="ChaCha20 Cipher Suites with HMAC-SHA1">
-
-      <t>The following CipherSuites are defined.</t>
-
-      <figure>
-	<artwork><![CDATA[
-  TLS_RSA_WITH_CHACHA20_SHA              = {0xTBD, 0xTBD}
-  TLS_ECDHE_RSA_WITH_CHACHA20_SHA        = {0xTBD, 0xTBD}
-  TLS_ECDHE_ECDSA_WITH_CHACHA20_SHA      = {0xTBD, 0xTBD}
-
-  TLS_DHE_RSA_WITH_CHACHA20_SHA          = {0xTBD, 0xTBD}
-  TLS_DHE_PSK_WITH_CHACHA20_SHA          = {0xTBD, 0xTBD}
-
-  TLS_PSK_WITH_CHACHA20_SHA              = {0xTBD, 0xTBD}
-  TLS_ECDHE_PSK_WITH_CHACHA20_SHA        = {0xTBD, 0xTBD}
-  TLS_RSA_PSK_WITH_CHACHA20_SHA          = {0xTBD, 0xTBD}
-]]></artwork>
-      </figure>
-
-      <t>The MAC algorithm used in the ciphersuites above is HMAC-SHA1 <xref
-      target="RFC6234"/>.</t>
-
-    </section>
-
     <section anchor="chacha20suites-poly1305"
 	     title="ChaCha20 Cipher Suites with Poly1305">
       <t>
@@ -252,48 +226,6 @@
     </section>
     </section>
 
-    <section anchor="updates-tls"
-	     title="Updates to the TLS Standard Stream Cipher">
-<t>The ChaCha20 ciphersuites with HMAC-SHA1 defined in this document differ 
-from the TLS RC4 ciphersuites that have been the basis for the definition of 
-Standard Stream Cipher.
-Unlike RC4, ChaCha20 requires a nonce per record. This however, does not affect 
-the description of the Standard Stream Cipher if one assumes that a nonce is
-optional and depends on the cipher's characteristics.
-</t>
-<t>
-Hence, this document modifies the Standard Stream Cipher by adding an
-implicit nonce. The implicit nonce may consist of
- <list style='symbols'>
- <t>an optional fixed component ("salt"), generated from the key_block;</t>
- <t>a variable component, based on the 64-bit TLS record sequence
- number or the concatenation of the 16-bit epoch with the 48-bit sequence number in case of
- DTLS.</t>
- </list>
-</t>
-<t>
-Stream ciphers that don't require
-a nonce such as RC4 shall ignore it. Other stream ciphers that require
-a nonce, such as ChaCha20 with HMAC-SHA1, will use the nonce and reset their 
-state on each record.
-</t>
-   </section>
-    <section anchor="updates-dtls"
-	     title="Updates to DTLS">
-<t>
-The DTLS protocol requires the cipher in use to introduce no dependencies
-between TLS Records to allow lost or rearranged records. For that
-it explicitly bans stream ciphers (see Section 3.1 of <xref
-target="RFC6347"/>).
-</t>
-<t>
-As the stream cipher described in this document, unlike RC4, does not require 
-dependencies between records, this ban of stream ciphers is lifted with
-this document. Stream ciphers can be used with DTLS if they introduce no
-dependencies between records.
-</t>
-    </section>
-    
     <section anchor="ack"
              title="Acknowledgements">
 
@@ -321,17 +253,6 @@ dependencies between records.
   TLS_PSK_WITH_CHACHA20_POLY1305         = {0xTBD, 0xTBD}
   TLS_ECDHE_PSK_WITH_CHACHA20_POLY1305   = {0xTBD, 0xTBD}
   TLS_RSA_PSK_WITH_CHACHA20_POLY1305     = {0xTBD, 0xTBD}
-
-  TLS_RSA_WITH_CHACHA20_SHA              = {0xTBD, 0xTBD}
-  TLS_ECDHE_RSA_WITH_CHACHA20_SHA        = {0xTBD, 0xTBD}
-  TLS_ECDHE_ECDSA_WITH_CHACHA20_SHA      = {0xTBD, 0xTBD}
-
-  TLS_DHE_RSA_WITH_CHACHA20_SHA          = {0xTBD, 0xTBD}
-  TLS_DHE_PSK_WITH_CHACHA20_SHA          = {0xTBD, 0xTBD}
-
-  TLS_PSK_WITH_CHACHA20_SHA              = {0xTBD, 0xTBD}
-  TLS_ECDHE_PSK_WITH_CHACHA20_SHA        = {0xTBD, 0xTBD}
-  TLS_RSA_PSK_WITH_CHACHA20_SHA          = {0xTBD, 0xTBD}
 ]]></artwork>
       </figure>
 
@@ -364,9 +285,8 @@ dependencies between records.
 
       <t>This document should not introduce any other security
       considerations than those that directly follow from the use of
-      the stream cipher ChaCha20, the AEAD_CHACHA20_POLY1305 construction, and 
-      those that directly follow from introducing any set of stream cipher 
-      suites into TLS and DTLS (see also the Security Considerations section
+      the stream cipher ChaCha20, the AEAD_CHACHA20_POLY1305 construction, 
+      (see also the Security Considerations section
       of <xref target="I-D.irtf-cfrg-chacha20-poly1305"/>).</t>
 
     </section>
@@ -383,7 +303,6 @@ dependencies between records.
       &RFC4492;
       &RFC5246;
       &RFC5489;
-      &RFC6234;
       &RFC6347;
       
       &CHACHAPOLY;
