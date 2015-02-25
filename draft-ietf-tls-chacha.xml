@@ -5,7 +5,7 @@
 <!ENTITY RFC4492 SYSTEM 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.4492.xml'>
 <!ENTITY RFC5489 SYSTEM 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.5489.xml'>
 <!ENTITY RFC5116 SYSTEM 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.5116.xml'>
-<!ENTITY CHACHAPOLY SYSTEM 'http://xml.resource.org/public/rfc/bibxml-ids/reference.I-D.draft-irtf-cfrg-chacha20-poly1305-03.xml'>
+<!ENTITY CHACHAPOLY SYSTEM 'http://xml.resource.org/public/rfc/bibxml-ids/reference.I-D.draft-irtf-cfrg-chacha20-poly1305-10.xml'>
 ]>
 
 <?rfc compact="no"?>
@@ -62,7 +62,7 @@
     </author>
 
 
-    <date month="December" year="2014"/>
+    <date month="February" year="2015"/>
 
     <abstract>
 
