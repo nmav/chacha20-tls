@@ -13,7 +13,7 @@
 <?rfc symrefs="yes"?>
 
 <rfc category="std" ipr="trust200902"
-    updates="5246, 6347"  docName="draft-mavrogiannopoulos-chacha-tls-04">
+    updates="5246, 6347"  docName="draft-mavrogiannopoulos-chacha-tls-05">
 
   <front>
 
@@ -62,7 +62,7 @@
     </author>
 
 
-    <date month="February" year="2015"/>
+    <date month="April" year="2015"/>
 
     <abstract>
 
