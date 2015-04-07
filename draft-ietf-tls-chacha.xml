@@ -18,7 +18,7 @@
   <front>
 
     <title abbrev="chacha-tls">
-      The ChaCha Stream Cipher for Transport Layer Security
+      The ChaCha20-Poly1305 AEAD Cipher for Transport Layer Security
     </title>
 
     <author initials="A." surname="Langley" fullname="Adam Langley">
