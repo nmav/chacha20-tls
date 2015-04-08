@@ -165,7 +165,8 @@
       The salt is generated as part of the handshake process. It is either
       the client_write_IV (when the client is sending) or the server_write_IV 
       (when the server is sending).  The salt length (SecurityParameters.fixed_iv_length) 
-      is 4 bytes. The record_counter is the 64-bit TLS record sequence number. In case of DTLS the
+      is 4 bytes. The record_counter is the 64-bit TLS record sequence number
+      in network byte order. In case of DTLS the
       record_counter is formed as the concatenation of the 16-bit epoch 
       with the 48-bit sequence number.</t>
       <t>
